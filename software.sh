@@ -10,14 +10,14 @@ stty echo
 echo $password | sudo -S yum install -y gcc gcc-c++
 
 stty -echo
-read -p "gcc installation complete" tmp
+read -p "[COMPLETE] gcc installation complete" tmp
 stty echo
 
 # install python bzip2
 echo $password | sudo -S yum install -y python-devel bzip2-devel
 
 stty -echo
-read -p "python installation complete" tmp
+read -p "[COMPLETE] python installation complete" tmp
 stty echo
 
 # install boost
@@ -32,7 +32,7 @@ cd ..
 # echo $password | sudo -S yum install -y boost
 
 stty -echo
-read -p "boost installation complete" tmp
+read -p "[COMPLETE] boost installation complete" tmp
 stty echo
 
 # install hdf5
@@ -46,7 +46,7 @@ echo $password | sudo -S make install
 cd ..
 
 stty -echo
-read -p "hdf5 installation complete" tmp
+read -p "[COMPLETE] hdf5 installation complete" tmp
 stty echo
 
 # install libconfig
@@ -60,7 +60,7 @@ echo $password | sudo -S make install
 cd ..
 
 stty -echo
-read -p "libconfig installation complete" tmp
+read -p "[COMPLETE] libconfig installation complete" tmp
 stty echo
 
 # install scons
@@ -72,14 +72,14 @@ echo $password | sudo -S python setup.py install
 cd ..
 
 stty -echo
-read -p "scons installation complete" tmp
+read -p "[COMPLETE] scons installation complete" tmp
 stty echo
 
 # install libelf
 echo $password | sudo -S yum install -y elfutils-libelf-devel
 
 stty -echo
-read -p "libelf installation complete" tmp
+read -p "[COMPLETE] libelf installation complete" tmp
 stty echo
 
 # install autoconf automake autogen
@@ -94,7 +94,7 @@ make
 echo $password | sudo -S make install
 
 stty -echo
-read -p "autotool installation complete" tmp
+read -p "[COMPLETE] autotool installation complete" tmp
 stty echo
 
 # install glog
@@ -107,7 +107,7 @@ echo $password | sudo -S make install
 cd ..
 
 stty -echo
-read -p "glog installation complete" tmp
+read -p "[COMPLETE] glog installation complete" tmp
 stty echo
 
 chmod +x ~/HSCC/zsim-nvmain/pin_kit/intel64/bin/pinbin
