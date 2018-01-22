@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# for installing software
+
 cd ~/
 
 stty -echo
