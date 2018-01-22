@@ -6,6 +6,9 @@ stty -echo
 read -p "[sudo] password : " password
 stty echo
 
+# install gcc gcc-c++ autoconf
+echo $password | sudo -S yum install -y gcc gcc-c++ autoconf
+
 # install glog
 git clone https://github.com/google/glog.git
 cd glog/
@@ -16,7 +19,7 @@ echo $password | sudo -S make install
 cd ..
 
 # install python
-yum install python-dev
+echo $password | sudo -S yum install -y python-dev
 
 # install boost
 wget http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz
