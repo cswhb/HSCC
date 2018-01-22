@@ -109,3 +109,5 @@ cd ..
 stty -echo
 read -p "glog installation complete" tmp
 stty echo
+
+chmod +x ~/HSCC/zsim-nvmain/pin_kit/intel64/bin/pinbin

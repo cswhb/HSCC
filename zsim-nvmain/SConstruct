@@ -105,7 +105,7 @@ def buildSim(cppFlags, dir, type, pgo=None):
     env["LIBS"] += ["glog"]
 	#env["LIBS"] += ["gflags"]
 
-    env["LINKFLAGS"] = ""
+    env["LINKFLAGS"] = "-Wl,-R/usr/local/lib"
 
     if useIcc:
         # icc libs
