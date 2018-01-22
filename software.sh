@@ -7,7 +7,16 @@ read -p "[sudo] password : " password
 stty echo
 
 # install gcc gcc-c++ autoconf
-echo $password | sudo -S yum install -y gcc gcc-c++ autoconf
+echo $password | sudo -S yum install -y gcc gcc-c++
+
+# install autoconf
+curl -L -O http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
+chmod +x autoconf-2.69.tar.gz
+tar -zxvf autoconf-2.69.tar.gz
+cd autoconf-2.69
+echo $password | sudo -S yum install -y openssl-devel
+./configure
+make & make install
 
 # install glog
 git clone https://github.com/google/glog.git
@@ -19,7 +28,7 @@ echo $password | sudo -S make install
 cd ..
 
 # install python
-echo $password | sudo -S yum install -y python-dev
+echo $password | sudo -S yum install -y python-devel
 
 # install boost
 wget http://sourceforge.net/projects/boost/files/boost/1.59.0/boost_1_59_0.tar.gz
