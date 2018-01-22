@@ -1,9 +1,9 @@
 #!/bin/bash
 
+cd ~/
+
 stty -echo
-cd ~/rjsupplicant/x64
 read -p "[sudo] password : " password
-echo $password | sudo -S ./rjsupplicant -d 1 -s internet -u U201414805 -p 8272361whb &
 stty echo
 
 git clone https://github.com/google/glog.git
@@ -15,7 +15,7 @@ ls
 ./autogen.sh
 ./configure 
 make
-sudo make install
+echo $password | sudo -S make install
 cd ..
 
 yum install python-dev
@@ -26,7 +26,7 @@ tar -zxvf boost_1_59_0.tar.gz
 cd boost_1_59_0
 ./bootstrap.sh 
 ./bjam
-sudo ./bjam install
+echo $password | sudo -S ./bjam install
 cd ..
 
 wget https://support.hdfgroup.org/ftp/HDF5/releases/hdf5-1.10/hdf5-1.10.1/src/hdf5-1.10.1.tar.gz
@@ -34,7 +34,7 @@ tar -zxvf hdf5-1.10.1.tar.gz
 cd hdf5-1.10.1
 ./confugure
 make
-sudo make install
+echo $password | sudo -S make install
 cd ..
 
 wget https://hyperrealm.github.io/libconfig/dist/libconfig-1.7.2.tar.gz
@@ -42,5 +42,6 @@ tar -zxvf libconfig-1.7.2.tar.gz
 cd libconfig-1.7.2
 ./confugure
 make
-sudo make install
+echo $password | sudo -S make install
 cd ..
+
