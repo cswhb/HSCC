@@ -3,3 +3,7 @@ build/
 *.log
 *.out
 heartbeat
+zsim-cmp.h5
+zsim-ev.h5
+zsim.h5
+zsim.log.0
