@@ -1,12 +1,12 @@
-Starting zsim, built Fri Mar 16 16:19:23 CST 2018 (rev no git repo)
+Starting zsim, built Sun Mar 18 19:33:12 CST 2018 (rev no git repo)
 [H] Removed 1 old logfiles
 [H] Creating global segment, 8192 MBs
-[H] Global segment shmid = 1802240
+[H] Global segment shmid = 1966080
 [H] Deadlock detection ON
 launchprocess 0
 cmd:/home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/exe/astar_base.amd64-m64-gcc43-nn
 cmd:/home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/data/ref/input/BigLakes2048.cfg
-/home/whb/HSCC/zsim-nvmain/pin_kit/intel64/bin/pinbin -follow_execv -tool_exit_timeout 1 -t /home/whb/HSCC/zsim-nvmain/bin/libzsim.so -config /home/whb/HSCC/zsim-nvmain/config/flat.cfg -outputDir /home/whb/HSCC/zsim-nvmain -shmid 1802240 -logToFile -procIdx 0 -- /home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/exe/astar_base.amd64-m64-gcc43-nn /home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/data/ref/input/BigLakes2048.cfg 
+/home/whb/HSCC/zsim-nvmain/pin_kit/intel64/bin/pinbin -follow_execv -tool_exit_timeout 1 -t /home/whb/HSCC/zsim-nvmain/bin/libzsim.so -config /home/whb/HSCC/zsim-nvmain/config/flat.cfg -outputDir /home/whb/HSCC/zsim-nvmain -shmid 1966080 -logToFile -procIdx 0 -- /home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/exe/astar_base.amd64-m64-gcc43-nn /home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/data/ref/input/BigLakes2048.cfg 
 ************create nvmain---
 GetGlobalEventQueue:0x30cbce08
 nvmainConfig:0x7fffe38bc040
@@ -94,11 +94,11 @@ reversed page table:0
 create long mode
 counter tlb:0
 begin init memory management
-maxorder list size:4096
+maxorder list size:256
 free area init finished
 set low mem kbytes
-line num:64
+line num:1024
 [H] Attached to global heap
 print nvmain stat
-[H] Child 30214 done
+[H] Child 32335 done
 [H] All children done, exiting
