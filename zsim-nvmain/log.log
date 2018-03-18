@@ -1,0 +1,104 @@
+Starting zsim, built Fri Mar 16 16:19:23 CST 2018 (rev no git repo)
+[H] Removed 1 old logfiles
+[H] Creating global segment, 8192 MBs
+[H] Global segment shmid = 1802240
+[H] Deadlock detection ON
+launchprocess 0
+cmd:/home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/exe/astar_base.amd64-m64-gcc43-nn
+cmd:/home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/data/ref/input/BigLakes2048.cfg
+/home/whb/HSCC/zsim-nvmain/pin_kit/intel64/bin/pinbin -follow_execv -tool_exit_timeout 1 -t /home/whb/HSCC/zsim-nvmain/bin/libzsim.so -config /home/whb/HSCC/zsim-nvmain/config/flat.cfg -outputDir /home/whb/HSCC/zsim-nvmain -shmid 1802240 -logToFile -procIdx 0 -- /home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/exe/astar_base.amd64-m64-gcc43-nn /home/wxy/benchmark/spec_cpu2006/benchspec/CPU2006/473.astar/data/ref/input/BigLakes2048.cfg 
+************create nvmain---
+GetGlobalEventQueue:0x30cbce08
+nvmainConfig:0x7fffe38bc040
+NVMain: GlobalEventQueue: Added a memory subsystem running at 666MHz. My frequency is 3200MHz.
+create address translator
+reserved_channel num:1
+channels:4
+Created a First Ready First Come First Serve memory controller!
+channel decoder:
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+MainMemoryController.channel0.FRFCFS capacity is 8192 MB.
+Creating 64 command queues.
+set refreshqueued8 8
+Created a First Ready First Come First Serve memory controller!
+channel decoder:
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+MainMemoryController.channel1.FRFCFS capacity is 8192 MB.
+Creating 64 command queues.
+set refreshqueued8 8
+Created a First Ready First Come First Serve memory controller!
+channel decoder:
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+MainMemoryController.channel2.FRFCFS capacity is 8192 MB.
+Creating 64 command queues.
+set refreshqueued8 8
+Created a First Ready First Come First Serve memory controller!
+channel decoder:
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+Creating 8 banks in all 8 devices.
+MainMemoryController.channel3.FRFCFS capacity is 8192 MB.
+Creating 64 command queues.
+set refreshqueued8 8
+AL:0 CAS:9 tRDPDEN:13
+get write latency, AL:0 CAS:9 WRPDEN:114
+address mapping scheme is :SA:R:RK:BK:C:CH
+create buffer decoder
+Created a First Ready First Come First Serve memory controller!
+channel decoder:BufferDecoder
+Creating 8 banks in all 8 devices.
+DRAMBufferControllers.channel0.FRFCFS capacity is 1024 MB.
+Creating 8 command queues.
+set refreshqueued1 8
+AL:0 CAS:7 tRDPDEN:9
+address mapping scheme is :SA:R:RK:BK:C:CH
+cache buffer size is 40000000
+mem col size: 40Bytes
+cache col size: 40Bytes
+create block fetcher
+mem_col_size is: 40
+buffer_col_size is: 40
+t_fast_read:9
+t_slow_read:d
+t_slow_write:7b
+reset write increment step to:9
+memory size is:32GB
+mode_str:LongMode_Normal
+reversed page table:0
+create long mode
+counter tlb:0
+begin init memory management
+maxorder list size:4096
+free area init finished
+set low mem kbytes
+line num:64
+[H] Attached to global heap
+print nvmain stat
+[H] Child 30214 done
+[H] All children done, exiting

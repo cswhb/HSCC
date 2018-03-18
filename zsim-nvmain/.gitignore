@@ -1,7 +1,5 @@
 bin/
 build/
-*.log
-*.out
 heartbeat
 zsim-cmp.h5
 zsim-ev.h5
