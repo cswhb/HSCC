@@ -828,8 +828,8 @@ LongModePaging::LongModePaging(PagingStyle select): mode(select),cur_pdp_num(0),
   assert(zinfo);
   if(select == LongMode_Normal)			//4KB
   {
-	zinfo->page_size = 256*power(2,10);
-	zinfo->page_shift = 18;
+	zinfo->page_size = 512*power(2,10);
+	zinfo->page_shift = 19;
   }
   else if(select == LongMode_Middle )			//2MB
   {
