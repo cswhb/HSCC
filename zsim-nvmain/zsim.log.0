@@ -24,31 +24,238 @@
 [S 0] simulation init done
 [S 0] process id is 0
 [S 0] number of processes is 1
-[S 0] Started process, PID 5163
+[S 0] Started process, PID 12240
 [S 0] procMask: 0x0
 [S 0] [0] Adjusting clocks, domain 0, de-ffwd 0
 [S 0] vDSO info initialized
 [S 0] Thread 0 starting
-[S 0] Simulate Thread 5163 TID
+[S 0] Simulate Thread 12240 TID
+[S 0] FF control Thread TID 12245
 [S 0] Started contention simulation thread 0
 [S 0] Started scheduler watchdog thread
-[S 0] FF control Thread TID 5168
-[S 0] Detected possible stall due to fake leaves (1 current)
-[S 0]  [0/0] INVALID (0) @ 0x7fffe236e7de
-[S 0] Blacklisting from future fake leaves: [0] INVALID @ 0x7fffe236e7de | arg0 0x9 arg1 0x7fffae6d0010
-[S 0] schedContext done, cid 0, success 0 (gid 0)
-[S 0] Max total (aggregate) instructions reached (400002421)
-[S 0] Termination condition met, exiting
-[S 0] Terminating scheduler watchdog thread
-[S 0] schedContext done, cid 0, success 0 (gid 0)
-[S 0] process 0 simend
+[S 0] WARN: [0] ContextChange, reason FATAL_SIGNAL, inSyscall 0
+[S 0] [0] Fatal signal caught, finishing
 [S 0] process 0 simend
 [S 0] Dumping termination stats
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
 [S 0] Has nvmain 1, num memory controllers 1
-[S 0] page table number: 45
-[S 0] overhead of extended storage:0.021973 MB
-[S 0] sys.tlbs.itlb0 access time:128545063 	 hit time: 128545021 	 miss time: 42 	 evict time:0 	 hit rate:1.000
-[S 0] sys.tlbs.dtlb0 access time:68050046 	 hit time: 68048142 	 miss time: 1904 	 evict time:1648 	 hit rate:1.000
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] page table number: 15
+[S 0] overhead of extended storage:0.007324 MB
+[S 0] sys.tlbs.itlb0 access time:239731 	 hit time: 239659 	 miss time: 72 	 evict time:0 	 hit rate:1.000
+[S 0] sys.tlbs.dtlb0 access time:423149 	 hit time: 423032 	 miss time: 117 	 evict time:0 	 hit rate:1.000
 [S 0] sys.tlbs.itlb1 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.dtlb1 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.itlb2 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
@@ -63,21 +270,21 @@
 [S 0] sys.tlbs.dtlb6 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.itlb7 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.dtlb7 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
-[S 0] total TLB access time is: 196595109
+[S 0] total TLB access time is: 662880
 [S 0] sys.pgt_walker0 evict time:0 	 dirty evict time: 0 
 
-[S 0] sys.pgt_walker0 allocated pages:1946 
+[S 0] sys.pgt_walker0 allocated pages:186 
 
 [S 0] sys.pgt_walker0 TLB shootdown overhead:0 
 
 [S 0] sys.pgt_walker0 HSCC TLB shootdown overhead:0 
 
-[S 0] sys.pgt_walker0 PCM page mapping overhead:231536 
+[S 0] sys.pgt_walker0 PCM page mapping overhead:23780 
 
 [S 0] sys.pgt_walker0 DRAM page mapping overhead:0 
 
-[S 0] sys.pgt_walker0 TLB miss overhead(exclude TLB shootdown and page fault): 1352328
-[S 0] sys.pgt_walker0 TLB miss overhead (include TLB shootdown and page fault): 1583873
+[S 0] sys.pgt_walker0 TLB miss overhead(exclude TLB shootdown and page fault): 130152
+[S 0] sys.pgt_walker0 TLB miss overhead (include TLB shootdown and page fault): 153936
 [S 0] sys.pgt_walker0 clflush overhead caused by caching:0
 [S 0] sys.pgt_walker0 clflush overhead caused extra write:0
 [S 0] sys.pgt_walker1 evict time:0 	 dirty evict time: 0 
@@ -192,4 +399,6 @@
 [S 0] sys.pgt_walker7 TLB miss overhead (include TLB shootdown and page fault): 0
 [S 0] sys.pgt_walker7 clflush overhead caused by caching:0
 [S 0] sys.pgt_walker7 clflush overhead caused extra write:0
-[S 0] access of nvmain controller 0 : 1777122, read access count:957287 , write access count: 819835
+[S 0] access of nvmain controller 0 : 8180, read access count:8180 , write access count: 0
+[S 0] [watchdog] Deferring cleanup of pid 0 (12240), not finished yet
+[S 0] Finished scheduler watchdog thread
