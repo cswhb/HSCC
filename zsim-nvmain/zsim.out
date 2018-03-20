@@ -3,19 +3,19 @@
 root: # Stats
  contention: # Contention simulation stats
   domain-0: # Domain stats
-   time: 162200150412 # Weave simulation time
+   time: 184660880148 # Weave simulation time
  time: # Simulator time breakdown
-  init: 120328391
-  bound: 111208924710
-  weave: 169811934740
+  init: 116236199
+  bound: 107662455674
+  weave: 193739970765
   ff: 0
  trigger: 20000 # Reason for this stats dump
  phase: 150999 # Simulated phases
  sandy: # Core stats
   sandy-0: # Core stats
-   cycles: 1509993025 # Simulated unhalted cycles
-   cCycles: 626751568 # Cycles due to contention stalls
-   instrs: 400001682 # Simulated instructions
+   cycles: 1509994369 # Simulated unhalted cycles
+   cCycles: 626753137 # Cycles due to contention stalls
+   instrs: 400001744 # Simulated instructions
   sandy-1: # Core stats
    cycles: 0 # Simulated unhalted cycles
    cCycles: 0 # Cycles due to contention stalls
@@ -46,8 +46,8 @@ root: # Stats
    instrs: 0 # Simulated instructions
  l1d: # Cache stats
   l1d-0: # Filter cache stats
-   fhGETS: 60077238 # Filtered GETS hits
-   fhGETX: 6038776 # Filtered GETX hits
+   fhGETS: 60077247 # Filtered GETS hits
+   fhGETX: 6038777 # Filtered GETX hits
    hGETS: 17909 # GETS hits
    hGETX: 957097 # GETX hits
    mGETS: 957311 # GETS misses
@@ -167,7 +167,7 @@ root: # Stats
    latGETnet: 0 # GET request latency on network to next level
  l1i: # Cache stats
   l1i-0: # Filter cache stats
-   fhGETS: 128542282 # Filtered GETS hits
+   fhGETS: 128542302 # Filtered GETS hits
    fhGETX: 0 # Filtered GETX hits
    hGETS: 1158 # GETS hits
    hGETX: 0 # GETX hits
@@ -408,12 +408,12 @@ root: # Stats
  mem: # Memory controller stats
   mem-0: # Memory controller stats
    issued: 1777171 # Issued requests
-   rd: 957280 # Read requests
+   rd: 957281 # Read requests
    wr: 819890 # Write requests
    PUTS: 6319 # Clean Evictions (from lower level)
    PUTX: 819894 # Dirty Evictions (from lower level)
-   rdlat: 1141220156 # Total latency experienced by read requests
-   wrlat: 633371969 # Total latency experienced by write requests
+   rdlat: 1141222303 # Total latency experienced by read requests
+   wrlat: 633372070 # Total latency experienced by write requests
    footprint: 61265984 # Total memory footprint in bytes
    addresses: 957281 # Total number of distinct memory addresses
    mlh: # latency histogram for memory requests
@@ -429,19 +429,19 @@ root: # Stats
     9: 0
     10: 0
     11: 0
-    12: 3279
-    13: 272981
+    12: 3305
+    13: 272955
     14: 0
     15: 0
     16: 0
     17: 187
-    18: 696
-    19: 534
+    18: 697
+    19: 533
     20: 475
     21: 283
     22: 400
-    23: 225
-    24: 123
+    23: 226
+    24: 122
     25: 82
     26: 79
     27: 489
@@ -454,8 +454,8 @@ root: # Stats
     34: 63
     35: 58
     36: 83
-    37: 104
-    38: 58
+    37: 105
+    38: 57
     39: 39
     40: 25
     41: 14
@@ -495,17 +495,17 @@ root: # Stats
     75: 31
     76: 28
     77: 18
-    78: 207
-    79: 17407
+    78: 213
+    79: 17401
     80: 18
     81: 15
     82: 27
     83: 82
-    84: 152
-    85: 246
-    86: 89
-    87: 235
-    88: 159
+    84: 151
+    85: 248
+    86: 88
+    87: 229
+    88: 166
     89: 57
     90: 37
     91: 33
@@ -656,7 +656,7 @@ root: # Stats
    15: 0
    16: 0
  procCycles: # Per-process unhalted core cycles
-  0: 1509993025
+  0: 1509994369
   1: 0
   2: 0
   3: 0
@@ -721,7 +721,7 @@ root: # Stats
   62: 0
   63: 0
  procInstrs: # Per-process instructions
-  0: 400001682
+  0: 400001744
   1: 0
   2: 0
   3: 0

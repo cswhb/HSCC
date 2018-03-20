@@ -4,4 +4,5 @@ heartbeat
 zsim-cmp.h5
 zsim-ev.h5
 zsim.h5
+nvm-0-nvmain.out
 start.sh
