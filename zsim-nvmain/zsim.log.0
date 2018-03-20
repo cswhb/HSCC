@@ -24,31 +24,31 @@
 [S 0] simulation init done
 [S 0] process id is 0
 [S 0] number of processes is 1
-[S 0] Started process, PID 23076
+[S 0] Started process, PID 24594
 [S 0] procMask: 0x0
 [S 0] [0] Adjusting clocks, domain 0, de-ffwd 0
 [S 0] vDSO info initialized
 [S 0] Thread 0 starting
-[S 0] Simulate Thread 23076 TID
+[S 0] Simulate Thread 24594 TID
 [S 0] Started contention simulation thread 0
 [S 0] Started scheduler watchdog thread
-[S 0] FF control Thread TID 23081
+[S 0] FF control Thread TID 24599
 [S 0] Detected possible stall due to fake leaves (1 current)
-[S 0]  [0/0] INVALID (0) @ 0x7fffe23717de
-[S 0] Blacklisting from future fake leaves: [0] INVALID @ 0x7fffe23717de | arg0 0x9 arg1 0x7fffae6d2010
+[S 0]  [0/0] INVALID (0) @ 0x7fffe236f7de
+[S 0] Blacklisting from future fake leaves: [0] INVALID @ 0x7fffe236f7de | arg0 0x9 arg1 0x7fffae6dd010
 [S 0] schedContext done, cid 0, success 0 (gid 0)
-[S 0] Max total (aggregate) instructions reached (400002048)
+[S 0] Max total (aggregate) instructions reached (400001682)
 [S 0] Termination condition met, exiting
 [S 0] schedContext done, cid 0, success 0 (gid 0)
-[S 0] process 0 simend
-[S 0] Dumping termination stats
 [S 0] Terminating scheduler watchdog thread
 [S 0] process 0 simend
+[S 0] process 0 simend
+[S 0] Dumping termination stats
 [S 0] Has nvmain 1, num memory controllers 1
-[S 0] page table number: 28
-[S 0] overhead of extended storage:0.013672 MB
-[S 0] sys.tlbs.itlb0 access time:128544943 	 hit time: 128544937 	 miss time: 6 	 evict time:0 	 hit rate:1.000
-[S 0] sys.tlbs.dtlb0 access time:68049983 	 hit time: 68049958 	 miss time: 25 	 evict time:0 	 hit rate:1.000
+[S 0] page table number: 4
+[S 0] overhead of extended storage:0.001953 MB
+[S 0] sys.tlbs.itlb0 access time:128544825 	 hit time: 128544823 	 miss time: 2 	 evict time:0 	 hit rate:1.000
+[S 0] sys.tlbs.dtlb0 access time:68049921 	 hit time: 68049918 	 miss time: 3 	 evict time:0 	 hit rate:1.000
 [S 0] sys.tlbs.itlb1 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.dtlb1 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.itlb2 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
@@ -63,21 +63,21 @@
 [S 0] sys.tlbs.dtlb6 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.itlb7 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
 [S 0] sys.tlbs.dtlb7 access time:0 	 hit time: 0 	 miss time: 0 	 evict time:0 	 hit rate:-nan
-[S 0] total TLB access time is: 196594926
+[S 0] total TLB access time is: 196594746
 [S 0] sys.pgt_walker0 evict time:0 	 dirty evict time: 0 
 
-[S 0] sys.pgt_walker0 allocated pages:31 
+[S 0] sys.pgt_walker0 allocated pages:5 
 
 [S 0] sys.pgt_walker0 TLB shootdown overhead:0 
 
 [S 0] sys.pgt_walker0 HSCC TLB shootdown overhead:0 
 
-[S 0] sys.pgt_walker0 PCM page mapping overhead:7424 
+[S 0] sys.pgt_walker0 PCM page mapping overhead:1624 
 
 [S 0] sys.pgt_walker0 DRAM page mapping overhead:0 
 
-[S 0] sys.pgt_walker0 TLB miss overhead(exclude TLB shootdown and page fault): 19488
-[S 0] sys.pgt_walker0 TLB miss overhead (include TLB shootdown and page fault): 26918
+[S 0] sys.pgt_walker0 TLB miss overhead(exclude TLB shootdown and page fault): 1392
+[S 0] sys.pgt_walker0 TLB miss overhead (include TLB shootdown and page fault): 3018
 [S 0] sys.pgt_walker0 clflush overhead caused by caching:0
 [S 0] sys.pgt_walker0 clflush overhead caused extra write:0
 [S 0] sys.pgt_walker1 evict time:0 	 dirty evict time: 0 
@@ -192,4 +192,4 @@
 [S 0] sys.pgt_walker7 TLB miss overhead (include TLB shootdown and page fault): 0
 [S 0] sys.pgt_walker7 clflush overhead caused by caching:0
 [S 0] sys.pgt_walker7 clflush overhead caused extra write:0
-[S 0] access of nvmain controller 0 : 1777168, read access count:957286 , write access count: 819882
+[S 0] access of nvmain controller 0 : 1777179, read access count:957285 , write access count: 819894
