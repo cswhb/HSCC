@@ -1,4 +1,4 @@
-ehco "whb" | sudo -s sh run.sh
+echo "whb" | sudo -s sh run.sh
 git add .
 git commit -m "BFS 2MB 4*10^11 8GB"
 git push 
