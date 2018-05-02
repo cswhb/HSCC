@@ -1055,37 +1055,8 @@ Address LongModePaging::access(MemReq &req)
 	{
 		assert( pd_id != (unsigned)(-1));
 		assert( pt_id != (unsigned)(-1));
-		uint64_t realpage_shift=0;
 		//point to page table
-		for(int i = zinfo->procArray[procId]->procmax_shift ; i>=21 ; i--){
-		    ptr = get_next_level_address<void>((PageTable*)ptr,(pd_id>>(i-21))<<(i-21),i);
-			req.cycle += (zinfo->mem_access_time*6);
-			if( ptr ){
-				realpage_shift=i;
-			    pbuffer = point_to_buffer_table((PageTable*)ptr,0);//not accomplish 
-			    break;
-		    }
-	    }
-	    if( !ptr ){
-	    	ptr = get_next_level_address<void>((PageTable*)ptr,pd_id);
-		    req.cycle += (zinfo->mem_access_time*6);
-	    }
-	    if( ptr ){
-			    pbuffer = point_to_buffer_table((PageTable*)ptr,pt_id);//not accomplish 
-		}
-		else return PAGE_FAULT_SIG;
-		pgt = (PageTable*)ptr;
-		if(realpage_shift!=0){
-			ptr = get_next_level_address<void>((PageTable*)ptr,0,realpage_shift);
-		}
-		else {
-			for(int i = zinfo->procArray[procId]->procmax_shift>20?20:zinfo->procArray[procId]->procmax_shift ; i>=12 ; i--){
-					ptr = get_next_level_address<void>((PageTable*)ptr,(pt_id>>(i-12))<<(i-12),i);
-		            if( ptr )break;
-		    }
-		}
-		if(!ptr)return PAGE_FAULT_SIG; 
-		/*ptr = get_next_level_address<void>((PageTable*)ptr,pd_id,zinfo->page_shift);
+		ptr = get_next_level_address<void>((PageTable*)ptr,pd_id);
 		req.cycle += (zinfo->mem_access_time*6);
 		if( ptr )
 		{
@@ -1094,39 +1065,15 @@ Address LongModePaging::access(MemReq &req)
 		}
 		if( !ptr )
 		{
-			if(sinfo->procArray[procId]->procmax_shift<=21)
 			return PAGE_FAULT_SIG;
-			else
-			{
-				for(int i = zinfo->procArray[procId]->procmax_shift ; i>21 ; i--){
-					ptr = get_next_level_address<void>((PageTable*)ptr,(pd_id>>(i-21))<<(i-21),i);
-		            req.cycle += (zinfo->mem_access_time*6);
-		            if( ptr )
-		            {
-			            pbuffer = point_to_buffer_table((PageTable*)ptr,pt_id);//not accomplish 
-			            break;
-			            //std::cout<<req.lineAddr<<" point to dram buffer:"<<pbuffer<<std::endl;
-		            }
-				}
-				if( !ptr )return PAGE_FAULT_SIG;
-			}
 		}
 		pgt = (PageTable*)ptr;
 		//point to page or buffer table 
-		ptr = get_next_level_address<void>((PageTable*)ptr,pt_id,zinfo->page_shift);
+		ptr = get_next_level_address<void>((PageTable*)ptr,pt_id);
 		if( !ptr )
 		{
-			if(zinfo->procArray[procId]->procmax_shift<=12)
 			return PAGE_FAULT_SIG;
-			else
-			{
-				for(int i = zinfo->procArray[procId]->procmax_shift ; i>12 ; i--){
-					ptr = get_next_level_address<void>((PageTable*)ptr,(pt_id>>(i-12))<<(i-12),i);
-		            if( ptr )break;
-				}
-				if( !ptr )return PAGE_FAULT_SIG;
-			}
-		}*/
+		}
 	}
 	bool write_back = false;
 	uint32_t access_counter = 0;
