@@ -28,10 +28,11 @@ class BasePDTEntry: public GlobAlloc
 			next_level_ptr = NULL; 
 			set_read_write(); //all page can read and write both
 			set_user();	//default user can access all page
+			PDTEpage_shift=1;
 			//default is cache write back,cacheable,unaccessed,clear,page_size is 4KB, local page
 		}
 		BasePDTEntry(void* ppt):next_level_ptr(ppt)
-		{ entry_bits = 0;}
+		{ entry_bits = 0;PDTEpage_shift=1;}
 		virtual ~BasePDTEntry(){};
 	
 		void validate( void* next_level_addr , bool is_buffer = false )
@@ -201,6 +202,7 @@ class BasePDTEntry: public GlobAlloc
 	public:
 		void* next_level_ptr;
 		unsigned entry_bits;
+		uint64_t PDTEpage_shift; 
 };
 
 /*---------structure of page table--------*/

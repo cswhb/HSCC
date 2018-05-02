@@ -54,11 +54,23 @@ class ProcessTreeNode : public GlobAlloc {
         const g_vector<bool> mask;
         const g_vector<uint64_t> ffiPoints;
         const g_string syscallBlacklistRegex;
+        volatile uint64_t procpage_shift;
+        volatile uint64_t procmem_size;
+        volatile uint64_t procmax_shift;
+        volatile uint64_t procmax_size;
+        volatile uint64_t procpage_size;
     public:
         ProcessTreeNode(uint32_t _procIdx, uint32_t _groupIdx, bool _inFastForward, bool _inPause, bool _syncedFastForward,
                         uint32_t _clockDomain, uint32_t _portDomain, uint64_t _dumpHeartbeats, bool _dumpsResetHeartbeats, uint32_t _restarts,const g_vector<bool>& _mask, const g_vector<uint64_t>& _ffiPoints, const g_string& _syscallBlacklistRegex, const char*_patchRoot)
             : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), started(false), inFastForward(_inFastForward),
-              inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) {}
+              inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) 
+			  {
+			  	procpage_shift=zinfo->page_shift;
+			  	procmem_size=0;
+			  	procmax_shift=procpage_shift;
+			  	procpage_size=zinfo->page_size;
+			  	procmax_size = procpage_size;
+			  }
 
         void addChild(ProcessTreeNode* child) {
             children.push_back(child);
@@ -99,7 +111,21 @@ class ProcessTreeNode : public GlobAlloc {
         const char* getPatchRoot() const {
             return patchRoot;
         }
-
+        void setshift(){
+        	if(procmem_size <=procpage_size*256/2 &&procpageshift>12){
+        		//delete these will make procpage_size never decrease; 
+        		procpage_size/=2;
+        		procpage_shift-=1;
+			}
+        	else if(procmem_size>=procpage_size*256 && procpage_shift<22){
+        		procpage_size*=2;
+        		procpage_shift+=1;
+        		if(procmax_shift<procpage_shift){
+        			procmax_shift = procpage_shift;
+        			procmax_size = procpage_size;
+				}
+			}
+		}
         inline bool isInFastForward() const { return inFastForward; }
         inline bool isInPause() const { return inPause; }
         inline bool getSyncedFastForward() const { return syncedFastForward; }
