@@ -28,7 +28,7 @@ class BasePDTEntry: public GlobAlloc
 			next_level_ptr = NULL; 
 			set_read_write(); //all page can read and write both
 			set_user();	//default user can access all page
-			PDTEpage_shift=1;
+			PDTEpage_shift=zinfo->page_shift;
 			//default is cache write back,cacheable,unaccessed,clear,page_size is 4KB, local page
 		}
 		BasePDTEntry(void* ppt):next_level_ptr(ppt)
@@ -198,7 +198,13 @@ class BasePDTEntry: public GlobAlloc
 	{	entry_bits |= G;	}
 	void set_page_local()
 	{	entry_bits &= (~G);	}
-	
+	BasePDTEntry* operator=(BasePDTEntry* ptr )
+      { 
+         this->next_level_ptr=ptr->next_level_ptr;
+         this->entry_bits=ptr->entry_bits;
+         this->PDTEpage_shift=ptr->PDTEpage_shift;
+         return this;
+      }
 	public:
 		void* next_level_ptr;
 		unsigned entry_bits;
