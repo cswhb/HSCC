@@ -825,6 +825,7 @@ LongModePaging::LongModePaging(PagingStyle select): mode(select),cur_pdp_num(0),
 {
   PageTable* table = gm_memalign<PageTable>(CACHE_LINE_BYTES,1);
   pml4=new (table) PageTable(512);
+  pml4->table_level=4;
   assert(zinfo);
   if(select == LongMode_Normal)			//4KB
   {

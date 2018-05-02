@@ -265,6 +265,7 @@ public:
 	public:
 		g_vector<BasePDTEntry*> entry_array;
 		unsigned map_count;
+		int table_level;
 };
 #endif
 
