@@ -32,7 +32,7 @@ class BasePDTEntry: public GlobAlloc
 			//default is cache write back,cacheable,unaccessed,clear,page_size is 4KB, local page
 		}
 		BasePDTEntry(void* ppt):next_level_ptr(ppt)
-		{ entry_bits = 0;PDTEpage_shift=1;}
+		{ entry_bits = 0;PDTEpage_shift=zinfo->page_shift;}
 		virtual ~BasePDTEntry(){};
 	
 		void validate( void* next_level_addr , bool is_buffer = false )
@@ -221,6 +221,7 @@ public:
 		//init page table with page table entry
 		map_count = size;
 		entry_array.resize(map_count,NULL);
+		table_level=0;
 		BasePDTEntry* pg_table = gm_memalign<BasePDTEntry>(CACHE_LINE_BYTES, size);
 		for( uint64_t i=0 ; i<size; i++)
 		{
