@@ -15,9 +15,12 @@ class BaseTlbEntry: public GlobAlloc
 		//32bit in none-PAE, 52bit in PAE
 		Address v_page_no;
 		Address p_page_no;
+		uint64_t TLBpage_shift; 
 		uint16_t flag;
 		uint64_t lru_seq;	//keep track of LRU seq
 		BaseTlbEntry( Address vpn ,Address ppn ):v_page_no(vpn),p_page_no(ppn),flag(0),lru_seq(0)
+		{}
+		BaseTlbEntry( Address vpn ,Address ppn,uint64_t page_shift ):v_page_no(vpn),p_page_no(ppn),TLBpage_shift(page_shift),flag(0),lru_seq(0)
 		{}
 		BaseTlbEntry()
 		{}
@@ -26,6 +29,7 @@ class BaseTlbEntry: public GlobAlloc
 		{
 			v_page_no = target_tlb.v_page_no;
 			p_page_no = target_tlb.p_page_no;
+			TLBpage_shift=target_tlb.TLBpage_shift;
 			flag = target_tlb.flag;
 		}
 
@@ -94,6 +98,13 @@ class BaseTlbEntry: public GlobAlloc
 			v_page_no = vpn;
 			p_page_no = ppn;
 		}
+		
+		virtual void map( Address vpn , Address ppn , uint64_t pageshift )
+		{
+			v_page_no = vpn;
+			p_page_no = ppn;
+			TLBpage_shift=pageshift;
+		}
 
 	   virtual Address get_counter()
 	   {	return INVALID_PAGE_ADDR;	}
@@ -110,6 +121,8 @@ class TlbEntry: public BaseTlbEntry
 {
 	public:
 	TlbEntry( Address vpn,Address ppn , bool is_dram=false):BaseTlbEntry(vpn ,ppn)
+	 {}
+	 TlbEntry( Address vpn,Address ppn , uint64_t pageshift,bool is_dram=false):BaseTlbEntry(vpn ,ppn,pageshift)
 	 {}
 	TlbEntry():BaseTlbEntry()
 	{}
@@ -143,6 +156,10 @@ class ExtendTlbEntry: public BaseTlbEntry
 		{
 			set_in_dram( is_dram);
 		}
+		ExtendTlbEntry( Address vpn , Address ppn ,uint_64_t pageshift, bool is_dram = false):BaseTlbEntry(vpn ,ppn,pageshift),access_counter(0)
+		{
+			set_in_dram( is_dram);
+		}
 
 		virtual void operator = ( BaseTlbEntry &target_tlb) 
 		{
@@ -151,6 +168,7 @@ class ExtendTlbEntry: public BaseTlbEntry
 			life_time = tlb->life_time;	
 			v_page_no = tlb->v_page_no;
 			p_page_no = tlb->p_page_no;
+			TLBpage_shift = tlb->TLBpage_shift;
 			flag = tlb->flag;
 		}
 
