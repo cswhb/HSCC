@@ -43,6 +43,7 @@ Page* BuddyAllocator::allocate_pages( unsigned int gfp_mask , unsigned order )
 			std::cout<<"allocate failed inner"<<std::endl;
 		//else
 			//std::cout<<"page no:"<<std::hex<<page->pageNo<<std::endl;
+		else page->page_shift=order+12; 
 		futex_unlock(&buddy_lock);
 		return page;
 	}

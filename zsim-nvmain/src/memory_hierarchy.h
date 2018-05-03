@@ -84,6 +84,7 @@ struct MemReq {
     Address lineAddr;	//line address , virtual address
     AccessType type;	
     uint32_t childId;
+    uint64_t enable_shift;
     MESIState* state;
     uint64_t cycle; //cycle where request arrives at component
 

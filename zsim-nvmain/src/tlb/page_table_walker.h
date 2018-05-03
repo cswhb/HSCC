@@ -48,6 +48,7 @@ class PageTableWalker: public BasePageTableWalker
 			tlb_miss_overhead = 0;
 			clflush_overhead = 0;
 			extra_write = 0;
+			page_shift=zinfo->page_shift;
 			futex_init(&walker_lock);
 		}
 		~PageTableWalker(){}
@@ -468,6 +469,7 @@ public:
 		g_string pg_walker_name;
 	    BasePaging* paging;
 		uint64_t period;
+		uint64_t pageshift;
 		unsigned long long tlb_shootdown_overhead;
 		unsigned long long hscc_tlb_shootdown;
 		unsigned long long pcm_map_overhead;

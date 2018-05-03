@@ -203,12 +203,14 @@ class BasePDTEntry: public GlobAlloc
          this->next_level_ptr=ptr->next_level_ptr;
          this->entry_bits=ptr->entry_bits;
          this->PDTEpage_shift=ptr->PDTEpage_shift;
+         this->hugepage_enable=ptr->hugepage_enable;
          return this;
       }
 	public:
 		void* next_level_ptr;
 		unsigned entry_bits;
 		uint64_t PDTEpage_shift; 
+		unsigned hugepage_enable;
 };
 
 /*---------structure of page table--------*/

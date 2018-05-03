@@ -974,6 +974,7 @@ bool LongModePaging::unmap_page_table( Address addr)
 	entry_id_vec[1]=pdp_id;
 	entry_id_vec[2]=pd_id;
 	PageTable* table = NULL;
+	PageTable* table2 = NULL;
 	//point to page directory pointer table
 	if( mode == LongMode_Normal)
 	{
@@ -983,7 +984,27 @@ bool LongModePaging::unmap_page_table( Address addr)
 			debug_printf("didn't find entry indexed with %ld !",addr);
 			return false;
 		}
+		if((table->entry_array[pt_id])->PDTEpage_shift==23){
+			table2 = get_tables(2, entry_id_vec);
+			unsigned pd_entry_id=(pd_id>>2)<<2;
+			invalidate_entry(table2,pd_entry_id);
+			for(unsigned i=pd_entry_id;i<=pd_entry_id|0x3;i++){
+				table2->entry_array[i]=table2->entry_array[pd_entry_id];
+			}
+		}
+		else if((table->entry_array[pt_id])->PDTEpage_shift==17){
+			unsigned pt_entry_id=(pt_id>>5)<<5;
+			invalidate_page(table,pt_entry_id);
+			for(unsigned i=pt_entry_id;i<=pt_entry_id|0x1f;i++){
+				table->entry_array[i]=table->entry_array[pt_entry_id];
+			}
+		}
+		else if((table->entry_array[pt_id])->PDTEpage_shift==12)
 		invalidate_page(table,pt_id);
+		else {
+			debug_printf("unmap error !");
+			return false;
+		}
 	}
 	else if( mode == LongMode_Middle )
 	{
@@ -1020,6 +1041,7 @@ Address LongModePaging::access(MemReq &req)
 	PageTable* pgt = NULL;
 	if( !pdp_ptr)
 	{
+		req.enable_shift=zinfo->procArray[procId]->procpage_shift;
 		return PAGE_FAULT_SIG;
 	}
 	if( mode == LongMode_Huge)
@@ -1034,6 +1056,7 @@ Address LongModePaging::access(MemReq &req)
 	void* ptr = get_next_level_address<void>(pdp_ptr,pdp_id );
 	if( !ptr )
 	{
+		req.enable_shift=zinfo->procArray[procId]->procpage_shift;
 		return PAGE_FAULT_SIG;
 	}
 	if( mode == LongMode_Middle)
