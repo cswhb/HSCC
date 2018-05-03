@@ -1100,6 +1100,7 @@ PageTable* LongModePaging::allocate_page_directory_pointer( unsigned pml4_entry_
 	{
 		PageTable* table_tmp= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
 		PageTable* table = new (table_tmp) PageTable(ENTRY_512);
+		table->table_level=3; 
 		allocate_time++;
 		validate_entry(pml4 , pml4_entry_id , table);
 		cur_pdp_num++;
@@ -1149,6 +1150,7 @@ PageTable* LongModePaging::allocate_page_directory( unsigned pml4_entry_id , uns
 		{
 			PageTable* table_tmp= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
 			PageTable* pd_table = new (table_tmp) PageTable(ENTRY_512);
+			pd_table->table_level=2;
 			validate_entry(pdp_table , pdpt_entry_id , pd_table);
 			cur_pd_num++;
 			allocate_time = 1;
@@ -1167,6 +1169,7 @@ PageTable* LongModePaging::allocate_page_directory( unsigned pml4_entry_id , uns
 			PageTable* pdpt_table = get_next_level_address<PageTable>(pml4,pml4_entry_id);
 			PageTable* table_tmp= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
 			PageTable* pd_table=new (table_tmp)PageTable(ENTRY_512);
+			pd_table->table_level=2;
 			allocate_time++;
 			validate_entry(pdpt_table , pdpt_entry_id , pd_table);
 			cur_pd_num++;
@@ -1210,6 +1213,7 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 			{
 				PageTable* table_tmp= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
 				PageTable* table = new (table_tmp)PageTable(ENTRY_512);
+				table->table_level=1;
 				validate_entry(pd_table , pdt_entry_id ,table );
 				cur_pt_num++;
 				alloc_time++;
@@ -1225,6 +1229,7 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 				PageTable* page_dir = get_next_level_address<PageTable>( pdp_table , pdpt_entry_id);
 				PageTable* table= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
 				PageTable* pg_table=new (table)PageTable(ENTRY_512);
+				pg_table->table_level=1;
 				validate_entry(page_dir , pdt_entry_id , pg_table );
 				cur_pt_num++;
 				alloc_time++;
@@ -1236,14 +1241,17 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 	{
 		PageTable* g_tables = gm_memalign<PageTable>(CACHE_LINE_BYTES,3);
 		PageTable* pdp_table=new (&g_tables[0])PageTable(ENTRY_512);
+		pdp_table->table_level=3;
 		//std::cout<<"validate pg dir pointer in pml4"<<std::dec<<pml4_entry_id<<std::endl;
 		validate_entry(pml4,pml4_entry_id,pdp_table);
 		cur_pdp_num++;
 		PageTable* pd_table=new (&g_tables[1])PageTable(ENTRY_512);
+		pd_table->table_level=2;
 		//std::cout<<"validate page directory table in pg dir pointer"<<std::dec<<pdpt_entry_id<<std::endl;
 		validate_entry(pdp_table,pdpt_entry_id , pd_table);
 		cur_pd_num++;
 		PageTable* pg_table=new (&g_tables[2])PageTable(ENTRY_512);
+		pg_table->table_level=1;
 		//std::cout<<"new page  table"<<std::endl;
 		validate_entry(pd_table , pdt_entry_id , pg_table);
 		//std::cout<<"validate: "<<std::dec<<pml4_entry_id<<","<<std::dec<<pdpt_entry_id<<","<<std::dec<<pdt_entry_id<<std::endl;
@@ -1361,9 +1369,12 @@ bool LongModePaging::remove_page_directory(pair_list high_level_entry)
 }
 
 bool LongModePaging::remove_page_table(unsigned pml4_entry_id , unsigned pdp_entry_id , unsigned pd_entry_id)
+//delete multiply pagesize
 {
 	assert(mode==LongMode_Normal);
 	PageTable* pdp_table = NULL;
+	unsigned start_pd_entry_id;
+	uint64_t shift;
 	if( (pdp_table = get_next_level_address<PageTable>(pml4,pml4_entry_id)))
 	{
 		PageTable* pd_table=NULL;
@@ -1372,8 +1383,19 @@ bool LongModePaging::remove_page_table(unsigned pml4_entry_id , unsigned pdp_ent
 			PageTable* pg_table = NULL;
 			if( (pg_table=get_next_level_address<PageTable>(pd_table, pd_entry_id)) )
 			{
-				invalidate_entry<PageTable>(pd_table , pd_entry_id);
-				cur_pt_num--;
+				shift=(*pd_table)[pd_entry_id]->PDTEpage_shift;
+				if(shift>21){
+					start_pd_entry_id=(pd_entry_id>>(shift-21))<<(shift-21);
+					invalidate_entry<PageTable>(pd_table ,start_pd_entry_id);
+					for(unsigned i =start_pd_entry_id,int t=0;t<power(2,shift-21);t++,i++){
+					  (*((*pd_table)[i]))=(*((*pd_table)[start_pd_entry_id]));
+					  cur_pt_num--;
+					}
+				}
+				else{
+					invalidate_entry<PageTable>(pd_table , pd_entry_id);
+				    cur_pt_num--;
+				}
 			}
 		}
 	}
