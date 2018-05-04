@@ -181,6 +181,8 @@ class LongModePaging: public BasePaging
 
 		PageTable* allocate_page_table( unsigned pml4_entry_id , 
 				unsigned pdpt_entry_id , unsigned pdt_entry_id, int& alloc_time);
+		PageTable* allocate_page_table( unsigned pml4_entry_id , 
+				unsigned pdpt_entry_id , unsigned pdt_entry_id, int& alloc_time,PageTable**table2);
 		bool allocate_page_table(triple_list high_level_entry);
 
 		//remove
