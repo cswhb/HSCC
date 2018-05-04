@@ -11,6 +11,7 @@
 #include "tlb/common_tlb.h"
 #include "tlb/common_func.h"
 #include "DRAM-buffer/DRAM_buffer_block.h"
+#include "process_tree.h"//cswhb modified 
 //#include "tlb/page_table_walker.h"
 
 template<class T>
