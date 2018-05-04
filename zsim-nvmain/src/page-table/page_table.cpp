@@ -1117,10 +1117,21 @@ Address LongModePaging::access(MemReq &req)
 		assert( pd_id != (unsigned)(-1));
 		assert( pt_id != (unsigned)(-1));
 		//point to page table
+		if(((*((PageTable*)ptr))[(pd_id>>2)<<2])->hugepage_enable>0){
+			if(zinfo->procArray[procId]->procpage_shift>=17)
+			req.enable_shift=17;
+			else req.enable_shift=12;
+		}
+		else{
+			req.enable_shift=zinfo->procArray[procId]->procpage_shift;
+		}
 		ptr = get_next_level_address<void>((PageTable*)ptr,pd_id);
 		req.cycle += (zinfo->mem_access_time*6);
 		if( ptr )
 		{
+			if(((*((PageTable*)ptr))[(pt_id>>5)<<5])->hugepage_enable>0){
+			  req.enable_shift=12;
+		    }
 			pbuffer = point_to_buffer_table((PageTable*)ptr,pt_id);
 			//std::cout<<req.lineAddr<<" point to dram buffer:"<<pbuffer<<std::endl;
 		}
@@ -1549,7 +1560,7 @@ bool LongModePaging::remove_page_table(Address addr , Address size)
 		remove_page_table( pml4_entry , pdp_entry , pd_entry+i);
 	return true;
 }
-bool LongModePaging::set_enable_shift(){
+bool LongModePaging::set_enable_shift(MemReq &req){
 	
 }
 bool LongModePaging::remove_page_table( triple_list high_level_entry)

@@ -121,11 +121,12 @@ class PageTableWalker: public BasePageTableWalker
 		    Page* page = NULL;
 			if( zinfo->buddy_allocator)
 			{
-				page = zinfo->buddy_allocator->allocate_pages(0);
+				page = zinfo->buddy_allocator->allocate_pages(req.enable_shift-12);
+				zinfo->procArray[req.srcId]->setshift(req.enable_shift);
 				if(page)
 				{
 					//TLB shootdown
-					Address vpn = req.lineAddr>>(zinfo->page_shift);
+					Address vpn = req.lineAddr>>(req.enable_shift)<<((req.enable_shift)-12);
 					tlb_shootdown(req, vpn, tlb_shootdown_overhead );
 					if( zinfo->enable_shared_memory)
 					{

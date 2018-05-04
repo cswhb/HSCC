@@ -239,8 +239,9 @@ class CommonTlb: public BaseTlb
 		{
 			bool deleted = false;
 			//look up tlb entry first
+			Address tmp_vpn;
 			T* delete_entry=look_up(vpage_no);
-			if(delete_entry)
+			if(delete_entry&&delete_entry->TLBpage_shift==12)
 			{
 				tlb_trie.erase( delete_entry->v_page_no);
 				tlb_trie_pa.erase( delete_entry->p_page_no);
@@ -248,8 +249,34 @@ class CommonTlb: public BaseTlb
 				free_entry_list.push_back(delete_entry);
 				deleted = true;
 			}
-			else
-				warning("there has no entry whose virtual page num is %ld",tlb);
+			else//cswhb changed
+			{
+				tmp_vpn=((vpage_no)>>5)<<5;
+				delete_entry=look_up(tmp_vpn);
+				if(delete_entry && delete_entry->TLBpage_shift==17)
+			    {
+				   tlb_trie.erase( delete_entry->v_page_no);
+				   tlb_trie_pa.erase( delete_entry->p_page_no);
+				   delete_entry->set_invalid();
+				   free_entry_list.push_back(delete_entry);
+				   deleted = true;
+			    }
+			    else {
+			    	tmp_vpn=((vpage_no)>>11)<<11;
+				    delete_entry=look_up(tmp_vpn);
+				    if(delete_entry && delete_entry->TLBpage_shift==23)
+			        {
+				      tlb_trie.erase( delete_entry->v_page_no);
+				      tlb_trie_pa.erase( delete_entry->p_page_no);
+				      delete_entry->set_invalid();
+				      free_entry_list.push_back(delete_entry);
+				      deleted = true;
+			        }
+			        else {
+			        	warning("there has no entry whose virtual page num is %ld",tlb);
+					}
+				}
+			}
 			return deleted;
 		}
 

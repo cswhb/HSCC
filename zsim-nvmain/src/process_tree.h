@@ -111,7 +111,8 @@ class ProcessTreeNode : public GlobAlloc {
         const char* getPatchRoot() const {
             return patchRoot;
         }
-        void setshift(){
+        void setshift(uint64_t shift){
+        	procmem_size+=1<<shift;
         	if(procmem_size <=procpage_size*256/2 &&procpageshift>12){
         		//delete these will make procpage_size never decrease; 
         		procpage_size/=2;

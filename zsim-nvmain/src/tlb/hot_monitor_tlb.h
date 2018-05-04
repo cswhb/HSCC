@@ -53,9 +53,9 @@ class HotMonitorTlb: public BaseTlb
 			Address ppn;
 			for(uint64_t i=index[maxpage_shift];i>0;i--){
 				pageshift=rank[i];
-				pagesize= 1<<pageshift£» 
+				pagesize= 1<<pageshift;
 				offset = virt_addr &(pagesize-1);
-			    vpn = (virt_addr >>(pageshift))<<(pageshift);
+			    vpn = (virt_addr >>(pageshift))<<(pageshift-12);
 			    entry= ordinary_tlb->look_up(vpn);
 			    if(entry){
 			    	if(entry->TLBpage_shift==pageshift)break;
@@ -68,8 +68,8 @@ class HotMonitorTlb: public BaseTlb
 			if( !entry )
 			{
 				ppn = ordinary_tlb->page_table_walker->access(req);
-				vpn=(virt_addr>>(req.enable_shift)<<(req.enable_shift);
-				offset=virt_addr &((1<<req.enable_shift)-1);
+				vpn=(virt_addr>>(req.enable_shift)<<(req.enable_shift-12);
+				offset=virt_addr &((1<<(req.enable_shift))-1);
 				if( zinfo->multi_queue)
 				{
 					access_counter = req.childId; 
@@ -88,7 +88,7 @@ class HotMonitorTlb: public BaseTlb
 				{	
 					entry->set_dirty();
 					MemReq wt_req;
-					wt_req.lineAddr = entry->v_page_no;
+					wt_req.lineAddr = (entry->v_page_no)<<zinfo->page_shift;
 					wt_req.cycle = req.cycle;
 					wt_req.type = SETDIRTY;
 					ordinary_tlb->page_table_walker->write_through(wt_req);
@@ -138,6 +138,7 @@ class HotMonitorTlb: public BaseTlb
 			{
 			  entry = ordinary_tlb->tlb[i];
 			  if(!entry->is_in_dram() && entry->is_valid() && entry->v_page_no!=vpn)
+			       if((vpn>>(entry->TLBpage_shift-12)<<(entry->TLBpage_shift-12))!=entry->v_page_no)//cswhb change
 				   ordinary_tlb->tlb[i]->decre_lifetime();
 			}
 		}
@@ -170,8 +171,19 @@ class HotMonitorTlb: public BaseTlb
 		{
 			//typename CommonTlbEntryTrie::TrieHandle result_node = (ordinary_tlb->tlb_trie_pa).search(p_page_no);
 			T* result_node = NULL;
-			if( ordinary_tlb->tlb_trie_pa.count(p_page_no))
+			if( ordinary_tlb->tlb_trie_pa.count(p_page_no)){//cswhb modified
 				result_node =(ordinary_tlb->tlb_trie_pa)[p_page_no];
+			}
+			else if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>5)>>5)){
+				result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>5)>>5];
+				if(result_node ->TLBpage_shift!=17)result_node=NULL;
+			}
+			if(!result_node){
+				if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>11)>>11)){	
+				    result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>11)>>11)];
+				    if(result_node ->TLBpage_shift!=23)result_node=NULL;
+			    }
+			}
 			over_thres = unOverThres;
 			if( result_node )
 			{
@@ -219,7 +231,7 @@ class HotMonitorTlb: public BaseTlb
 			}
 			return NULL;
 		}
-        T* insert( Address vpage_no ,Address ppn ,uint64_t pageshift, uint32_t access_counter)
+        T* insert( Address vpage_no ,Address ppn ,uint64_t pageshift, uint32_t access_counter)//cswhb changed
 		{
 			//DRAM buffer TLB 
 			if( (ppn) >= zinfo->high_addr )
