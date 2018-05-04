@@ -877,7 +877,7 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 	if( mode == LongMode_Normal)
 	{
 		assert( (pd!=(unsigned)(-1)) &&(pt!=(unsigned)(-1)));
-		table = allocate_page_table(pml4,pdp,pd, alloc_time,table2);
+		table = allocate_page_table(pml4,pdp,pd, alloc_time,&table2);
 		if( !table )
 		{
 			debug_printf("allocate page table for LongMode_Normal failed!");
@@ -897,8 +897,8 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 			mask=0x1f;
 			new_pt=pt&(~mask);
 			(*table2)[(pd>>2)<<2]->hugepage_enable+=0x1<<17;
-			for(unsigned i =new_pt;i<=pt|mask;i++){
-				(*table)[i]=(*table)[pt];
+			for(unsigned i =new_pt;i<=(pt|mask);i++){
+				*((*table)[i])=*((*table)[pt]);
 			}
 		}
 		else if((*table)[pt]->PDTEpage_shift==23){
@@ -906,10 +906,10 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 			mask=0x3;
 			new_pd=pd&(~mask);
 			for(unsigned i =0;i<512;i++){
-				(*table)[i]=(*table)[pt];
+				*((*table)[i])=*((*table)[pt]);
 			}
-			for(unsigned i =new_pd;i<=pd|mask;i++){
-				(*table2)[i]=(*table2)[pd];
+			for(unsigned i =new_pd;i<=(pd|mask);i++){
+				*((*table)[i])=*((*table)[pd]);
 			}
 		}
 		else {
@@ -1022,14 +1022,14 @@ bool LongModePaging::unmap_page_table( Address addr)
 		}
 		if((table->entry_array[pt_id])->PDTEpage_shift==23){
 			invalidate_entry(table2,pd_entry_id);
-			for(unsigned i=pd_entry_id;i<=pd_entry_id|0x3;i++){
+			for(unsigned i=pd_entry_id;i<=(pd_entry_id|0x3);i++){
 				table2->entry_array[i]=table2->entry_array[pd_entry_id];
 			}
 		}
 		else if((table->entry_array[pt_id])->PDTEpage_shift==17){
 			
 			invalidate_page(table,pt_entry_id);
-			for(unsigned i=pt_entry_id;i<=pt_entry_id|0x1f;i++){
+			for(unsigned i=pt_entry_id;i<=(pt_entry_id|0x1f);i++){
 				table->entry_array[i]=table->entry_array[pt_entry_id];
 			}
 			(*table2)[pd_entry_id]->hugepage_enable-=1<<17;
@@ -1127,7 +1127,7 @@ Address LongModePaging::access(MemReq &req)
 		else{
 			req.enable_shift=zinfo->procArray[procId]->procpage_shift;
 		}
-		table2=ptr;
+		table2=(PageTable*)ptr;
 		ptr = get_next_level_address<void>((PageTable*)ptr,pd_id);
 		req.cycle += (zinfo->mem_access_time*6);
 		if( ptr )
@@ -1338,7 +1338,7 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 
 
 PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id , 
-		unsigned pdpt_entry_id , unsigned pdt_entry_id , int& alloc_time,PageTable* &table2)
+		unsigned pdpt_entry_id , unsigned pdt_entry_id , int& alloc_time,PageTable**table2)
 {
 	alloc_time = 0;
 	assert( mode == LongMode_Normal);
@@ -1348,7 +1348,7 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 		PageTable* pd_table=get_next_level_address<PageTable>(pdp_table , pdpt_entry_id);
 		if(pd_table)
 		{
-			table2=pd_table;
+			*table2=pd_table;
 			if(is_present(pd_table , pdt_entry_id))
 			{
 				PageTable* table = get_next_level_address<PageTable>(pd_table,pdt_entry_id);
@@ -1372,7 +1372,7 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 			{
 				//get page directory
 				PageTable* page_dir = get_next_level_address<PageTable>( pdp_table , pdpt_entry_id);
-				table2=page_dir;
+				*table2=page_dir;
 				PageTable* table= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
 				PageTable* pg_table=new (table)PageTable(ENTRY_512);
 				pg_table->table_level=1;
@@ -1393,7 +1393,7 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 		cur_pdp_num++;
 		PageTable* pd_table=new (&g_tables[1])PageTable(ENTRY_512);
 		pd_table->table_level=2;
-		table2=pd_table;
+		*table2=pd_table;
 		//std::cout<<"validate page directory table in pg dir pointer"<<std::dec<<pdpt_entry_id<<std::endl;
 		validate_entry(pdp_table,pdpt_entry_id , pd_table);
 		cur_pd_num++;
@@ -1521,6 +1521,7 @@ bool LongModePaging::remove_page_table(unsigned pml4_entry_id , unsigned pdp_ent
 	PageTable* pdp_table = NULL;
 	unsigned start_pd_entry_id;
 	uint64_t shift;
+	int t;
 	if( (pdp_table = get_next_level_address<PageTable>(pml4,pml4_entry_id)))
 	{
 		PageTable* pd_table=NULL;
@@ -1533,7 +1534,7 @@ bool LongModePaging::remove_page_table(unsigned pml4_entry_id , unsigned pdp_ent
 				if(shift>21){
 					start_pd_entry_id=(pd_entry_id>>(shift-21))<<(shift-21);
 					invalidate_entry<PageTable>(pd_table ,start_pd_entry_id);
-					for(unsigned i =start_pd_entry_id,int t=0;t<power(2,shift-21);t++,i++){
+					for(unsigned i =start_pd_entry_id, t=0;t<power(2,shift-21);t++,i++){
 					  (*((*pd_table)[i]))=(*((*pd_table)[start_pd_entry_id]));
 					  cur_pt_num--;
 					}
@@ -1562,9 +1563,6 @@ bool LongModePaging::remove_page_table(Address addr , Address size)
 	for( unsigned i=0; i<page_table_num ;i++)
 		remove_page_table( pml4_entry , pdp_entry , pd_entry+i);
 	return true;
-}
-bool LongModePaging::set_enable_shift(MemReq &req){
-	
 }
 bool LongModePaging::remove_page_table( triple_list high_level_entry)
 {

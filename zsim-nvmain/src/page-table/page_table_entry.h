@@ -11,6 +11,7 @@
 #include "g_std/g_vector.h"
 #include "locks.h"
 #include "galloc.h"
+#include "zsim.h"//cswhb added 
 #include "pad.h"
 /*-----commmon flag of page table entry related----*/
 /*----basic page table entry mapping maintaince-----*/
