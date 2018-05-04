@@ -156,7 +156,7 @@ class ExtendTlbEntry: public BaseTlbEntry
 		{
 			set_in_dram( is_dram);
 		}
-		ExtendTlbEntry( Address vpn , Address ppn ,uint_64_t pageshift, bool is_dram = false):BaseTlbEntry(vpn ,ppn,pageshift),access_counter(0)
+		ExtendTlbEntry( Address vpn , Address ppn ,uint64_t pageshift, bool is_dram = false):BaseTlbEntry(vpn ,ppn,pageshift),access_counter(0)
 		{
 			set_in_dram( is_dram);
 		}

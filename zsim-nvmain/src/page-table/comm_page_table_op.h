@@ -25,7 +25,7 @@ T* get_next_level_address(PageTable* table , unsigned entry_id)
 template<class T>
 T* get_next_level_address(PageTable* table , unsigned entry_id,uint64_t page_shift)
 {
-	T*temp=(T*)((*table)[entry_id])->get_next_level_address()
+	T*temp=(T*)((*table)[entry_id])->get_next_level_address();
 	if(temp!=NULL&&(((*table)[entry_id])->PDTEpage_shift==pageshift)){
 		return temp;
 	}

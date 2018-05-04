@@ -48,7 +48,7 @@ class PageTableWalker: public BasePageTableWalker
 			tlb_miss_overhead = 0;
 			clflush_overhead = 0;
 			extra_write = 0;
-			page_shift=zinfo->page_shift;
+			//page_shift=zinfo->page_shift;
 			futex_init(&walker_lock);
 		}
 		~PageTableWalker(){}
