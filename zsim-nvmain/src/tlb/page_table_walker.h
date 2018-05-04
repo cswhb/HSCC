@@ -17,6 +17,8 @@
 #include "common/global_const.h"
 #include "page-table/page_table.h"
 
+#include "process_tree.h"//cswhb modified 
+
 #include "MMU/memory_management.h"
 #include "tlb/common_func.h"
 #include "tlb/hot_monitor_tlb.h"
