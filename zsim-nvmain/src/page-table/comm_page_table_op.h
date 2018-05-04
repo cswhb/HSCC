@@ -22,6 +22,7 @@ T* get_next_level_address(PageTable* table , unsigned entry_id)
 {
 	return (T*)((*table)[entry_id])->get_next_level_address();
 }
+template<class T>
 T* get_next_level_address(PageTable* table , unsigned entry_id,uint64_t page_shift)
 {
 	T*temp=(T*)((*table)[entry_id])->get_next_level_address()

@@ -54,11 +54,6 @@ class ProcessTreeNode : public GlobAlloc {
         const g_vector<bool> mask;
         const g_vector<uint64_t> ffiPoints;
         const g_string syscallBlacklistRegex;
-        volatile uint64_t procpage_shift;
-        volatile uint64_t procmem_size;
-        volatile uint64_t procmax_shift;
-        volatile uint64_t procmax_size;
-        volatile uint64_t procpage_size;
     public:
         ProcessTreeNode(uint32_t _procIdx, uint32_t _groupIdx, bool _inFastForward, bool _inPause, bool _syncedFastForward,
                         uint32_t _clockDomain, uint32_t _portDomain, uint64_t _dumpHeartbeats, bool _dumpsResetHeartbeats, uint32_t _restarts,const g_vector<bool>& _mask, const g_vector<uint64_t>& _ffiPoints, const g_string& _syscallBlacklistRegex, const char*_patchRoot)
@@ -96,7 +91,12 @@ class ProcessTreeNode : public GlobAlloc {
             assert_msg(curChildren < children.size(), "ProcessTreeNode::getNextChild, procIdx=%d curChildren=%d numChildren=%ld", procIdx, curChildren, children.size());
             return children[curChildren++];
         }
-
+        
+        volatile uint64_t procpage_shift;
+        volatile uint64_t procmem_size;
+        volatile uint64_t procmax_shift;
+        volatile uint64_t procmax_size;
+        volatile uint64_t procpage_size;
         uint32_t getProcIdx() const {return procIdx;}
         uint32_t getGroupIdx() const {return groupIdx;}
 
@@ -113,7 +113,7 @@ class ProcessTreeNode : public GlobAlloc {
         }
         void setshift(uint64_t shift){
         	procmem_size+=1<<shift;
-        	if(procmem_size <=procpage_size*256/2 &&procpageshift>12){
+        	if(procmem_size <=procpage_size*256/2 &&procpage_shift>12){
         		//delete these will make procpage_size never decrease; 
         		procpage_size/=2;
         		procpage_shift-=1;

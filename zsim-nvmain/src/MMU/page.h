@@ -39,7 +39,7 @@ struct Page
 
 		unsigned count;	//how many processes this page mapped to
 		Address pageNo;	//page no
-		unint64_t page_shift; 
+		uint64_t page_shift; 
 		int	map_count;
 		Zone* zone;
 		MemoryNode* node;

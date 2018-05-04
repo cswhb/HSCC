@@ -42,7 +42,7 @@ class HotMonitorTlb: public BaseTlb
 			index[17]=1;
 			index[23]=2;
 			ordinary_tlb->tlb_access_time++;
-			uint32_t procid=seq.srcId;
+			uint32_t procid=req.srcId;
 			uint64_t maxpage_shift=zinfo->procArray[procid]->procmax_shift;
 			Address virt_addr = req.lineAddr;
 			uint64_t pagesize=1<<maxpage_shift;
@@ -68,7 +68,7 @@ class HotMonitorTlb: public BaseTlb
 			if( !entry )
 			{
 				ppn = ordinary_tlb->page_table_walker->access(req);
-				vpn=(virt_addr>>(req.enable_shift)<<(req.enable_shift-12);
+				vpn=(virt_addr>>(req.enable_shift))<<(req.enable_shift-12);
 				offset=virt_addr &((1<<(req.enable_shift))-1);
 				if( zinfo->multi_queue)
 				{
@@ -174,13 +174,13 @@ class HotMonitorTlb: public BaseTlb
 			if( ordinary_tlb->tlb_trie_pa.count(p_page_no)){//cswhb modified
 				result_node =(ordinary_tlb->tlb_trie_pa)[p_page_no];
 			}
-			else if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>5)>>5)){
-				result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>5)>>5];
+			else if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>5)<<5)){
+				result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>5)<<5];
 				if(result_node ->TLBpage_shift!=17)result_node=NULL;
 			}
 			if(!result_node){
-				if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>11)>>11)){	
-				    result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>11)>>11)];
+				if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>11)<<11)){	
+				    result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>11)<<11];
 				    if(result_node ->TLBpage_shift!=23)result_node=NULL;
 			    }
 			}
