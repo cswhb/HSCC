@@ -84,7 +84,6 @@ struct MemReq {
     Address lineAddr;	//line address , virtual address
     AccessType type;	
     uint32_t childId;
-    uint64_t enable_shift;
     //alloc pagesize; 
     MESIState* state;
     uint64_t cycle; //cycle where request arrives at component
@@ -109,6 +108,7 @@ struct MemReq {
 	//Address vpn;
     inline void set(Flag f) {flags |= f;}
     inline bool is (Flag f) const {return flags & f;}
+    uint64_t enable_shift;
 };
 
 /** INTERFACES **/
