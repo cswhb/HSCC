@@ -886,7 +886,7 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		if( !is_valid(table, pt) )	
 			mapped_entry = (*table)[pt];
 		validate_entry(table , pt , pg_ptr, pbuffer);
-		(*table)[pt]->PDTEpage_shift=pg_ptr->page_shift; 
+		(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
 		if((*table)[pt]->PDTEpage_shift==12){
 			mask=0x1f;
 			new_pt=pt&(~mask);
@@ -1521,7 +1521,6 @@ bool LongModePaging::remove_page_table(unsigned pml4_entry_id , unsigned pdp_ent
 	PageTable* pdp_table = NULL;
 	unsigned start_pd_entry_id;
 	uint64_t shift;
-	int t;
 	if( (pdp_table = get_next_level_address<PageTable>(pml4,pml4_entry_id)))
 	{
 		PageTable* pd_table=NULL;
