@@ -16,6 +16,7 @@
 #include "pad.h"
 #include "core.h"
 #include "timing_core.h"
+#include "process_tree.h"//cswhb modified 
 /*-------------legacy paging------------*/
 lock_t NormalPaging::table_lock;
 NormalPaging::NormalPaging(PagingStyle select): mode(select),cur_page_table_num(0)
