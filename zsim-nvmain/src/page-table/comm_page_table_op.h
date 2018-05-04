@@ -59,7 +59,7 @@ inline void invalidate_page( PageTable* table , unsigned entry_id)
 		(*table)[entry_id]->invalidate_page();
 }
 
-//template<class T>  cswhb modified
+template<class T>  cswhb modified
 inline void invalidate_entry(PageTable* table , unsigned entry_id)
 {
 	((*table)[entry_id])->invalidate_page_table<T>();	
