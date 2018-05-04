@@ -870,11 +870,13 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 	//unsigned buffer_entry_id = get_buffer_table_off(addr,buffer_table_shift,mode);
 	assert( (pml4!=(unsigned)(-1)) && (pdp!=(unsigned)(-1)));
 	PageTable* table;
+	PageTable* table2;
 	int alloc_time = 0;
+	unsigned mask=1,new_pt,new_pd;
 	if( mode == LongMode_Normal)
 	{
 		assert( (pd!=(unsigned)(-1)) &&(pt!=(unsigned)(-1)));
-		table = allocate_page_table(pml4,pdp,pd, alloc_time);
+		table = allocate_page_table(pml4,pdp,pd, alloc_time,table2);
 		if( !table )
 		{
 			debug_printf("allocate page table for LongMode_Normal failed!");
@@ -883,6 +885,36 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		if( !is_valid(table, pt) )	
 			mapped_entry = (*table)[pt];
 		validate_entry(table , pt , pg_ptr, pbuffer);
+		(*table)[pt]->PDTEpage_shift=pg_ptr->page_shift; 
+		if((*table)[pt]->PDTEpage_shift==12){
+			mask=0x1f;
+			new_pt=pt&(~mask);
+			(*table)[new_pt]->hugepage_enable+=4*1024;
+			(*table2)[(pd>>2)<<2]->hugepage_enable+=4*1024;
+		}
+		else if((*table)[pt]->PDTEpage_shift==17){
+			mask=0x1f;
+			new_pt=pt&(~mask);
+			(*table2)[(pd>>2)<<2]->hugepage_enable+=0x1<<17;
+			for(unsigned i =new_pt;i<=pt|mask;i++){
+				(*table)[i]=(*table)[pt];
+			}
+		}
+		else if((*table)[pt]->PDTEpage_shift==23){
+			(*table2)[pd]->PDTEpage_shift=23;
+			mask=0x3;
+			new_pd=pd&(~mask);
+			for(unsigned i =0;i<512;i++){
+				(*table)[i]=(*table)[pt];
+			}
+			for(unsigned i =new_pd;i<=pd|mask;i++){
+				(*table2)[i]=(*table2)[pd];
+			}
+		}
+		else {
+			debug_printf("error map page_shift");
+			return false;
+		}
 		/*
 		if( pbuffer)
 		{
@@ -979,28 +1011,33 @@ bool LongModePaging::unmap_page_table( Address addr)
 	if( mode == LongMode_Normal)
 	{
 		table = get_tables(3, entry_id_vec);
+		table2 = get_tables(2, entry_id_vec);
+		unsigned pd_entry_id=(pd_id>>2)<<2;
+		unsigned pt_entry_id=(pt_id>>5)<<5;
 		if( !table )
 		{
 			debug_printf("didn't find entry indexed with %ld !",addr);
 			return false;
 		}
 		if((table->entry_array[pt_id])->PDTEpage_shift==23){
-			table2 = get_tables(2, entry_id_vec);
-			unsigned pd_entry_id=(pd_id>>2)<<2;
 			invalidate_entry(table2,pd_entry_id);
 			for(unsigned i=pd_entry_id;i<=pd_entry_id|0x3;i++){
 				table2->entry_array[i]=table2->entry_array[pd_entry_id];
 			}
 		}
 		else if((table->entry_array[pt_id])->PDTEpage_shift==17){
-			unsigned pt_entry_id=(pt_id>>5)<<5;
+			
 			invalidate_page(table,pt_entry_id);
 			for(unsigned i=pt_entry_id;i<=pt_entry_id|0x1f;i++){
 				table->entry_array[i]=table->entry_array[pt_entry_id];
 			}
+			(*table2)[pd_entry_id]->hugepage_enable-=1<<17;
 		}
-		else if((table->entry_array[pt_id])->PDTEpage_shift==12)
-		invalidate_page(table,pt_id);
+		else if((table->entry_array[pt_id])->PDTEpage_shift==12){
+			invalidate_page(table,pt_id);
+			(*table2)[pd_entry_id]->hugepage_enable-=1<<17;
+			(*table)[pt_entry_id]->hugepage_enable-=1<<12;
+		}
 		else {
 			debug_printf("unmap error !");
 			return false;
@@ -1285,6 +1322,78 @@ PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id ,
 	return NULL;
 }
 
+
+PageTable* LongModePaging::allocate_page_table(unsigned pml4_entry_id , 
+		unsigned pdpt_entry_id , unsigned pdt_entry_id , int& alloc_time,PageTable* &table2)
+{
+	alloc_time = 0;
+	assert( mode == LongMode_Normal);
+	PageTable* pdp_table=get_next_level_address<PageTable>(pml4 , pml4_entry_id);
+	if( pdp_table )
+	{
+		PageTable* pd_table=get_next_level_address<PageTable>(pdp_table , pdpt_entry_id);
+		if(pd_table)
+		{
+			table2=pd_table;
+			if(is_present(pd_table , pdt_entry_id))
+			{
+				PageTable* table = get_next_level_address<PageTable>(pd_table,pdt_entry_id);
+				return table;
+			}
+			else
+			{
+				PageTable* table_tmp= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
+				PageTable* table = new (table_tmp)PageTable(ENTRY_512);
+				table->table_level=1;
+				validate_entry(pd_table , pdt_entry_id ,table );
+				cur_pt_num++;
+				alloc_time++;
+				return table;
+			}
+		}
+		//page_direcory doesn't exist allocate
+		else
+		{
+			if( allocate_page_directory(pml4_entry_id,pdpt_entry_id, alloc_time))
+			{
+				//get page directory
+				PageTable* page_dir = get_next_level_address<PageTable>( pdp_table , pdpt_entry_id);
+				table2=page_dir;
+				PageTable* table= gm_memalign<PageTable>( CACHE_LINE_BYTES, 1);
+				PageTable* pg_table=new (table)PageTable(ENTRY_512);
+				pg_table->table_level=1;
+				validate_entry(page_dir , pdt_entry_id , pg_table );
+				cur_pt_num++;
+				alloc_time++;
+				return pg_table;
+			}
+		}
+	}
+	else
+	{
+		PageTable* g_tables = gm_memalign<PageTable>(CACHE_LINE_BYTES,3);
+		PageTable* pdp_table=new (&g_tables[0])PageTable(ENTRY_512);
+		pdp_table->table_level=3;
+		//std::cout<<"validate pg dir pointer in pml4"<<std::dec<<pml4_entry_id<<std::endl;
+		validate_entry(pml4,pml4_entry_id,pdp_table);
+		cur_pdp_num++;
+		PageTable* pd_table=new (&g_tables[1])PageTable(ENTRY_512);
+		pd_table->table_level=2;
+		table2=pd_table;
+		//std::cout<<"validate page directory table in pg dir pointer"<<std::dec<<pdpt_entry_id<<std::endl;
+		validate_entry(pdp_table,pdpt_entry_id , pd_table);
+		cur_pd_num++;
+		PageTable* pg_table=new (&g_tables[2])PageTable(ENTRY_512);
+		pg_table->table_level=1;
+		//std::cout<<"new page  table"<<std::endl;
+		validate_entry(pd_table , pdt_entry_id , pg_table);
+		//std::cout<<"validate: "<<std::dec<<pml4_entry_id<<","<<std::dec<<pdpt_entry_id<<","<<std::dec<<pdt_entry_id<<std::endl;
+		cur_pt_num++;
+		alloc_time += 3;
+		return pg_table;
+	}
+	return NULL;
+}
 
 bool LongModePaging::allocate_page_table(Address addr , Address size)
 {
