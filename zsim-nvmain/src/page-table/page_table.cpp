@@ -1076,6 +1076,7 @@ Address LongModePaging::access(MemReq &req)
 	//point to page table pointer table 
 	PageTable* pdp_ptr = get_next_level_address<PageTable>( pml4,pml4_id );
 	PageTable* pgt = NULL;
+	PageTable* table2 = NULL;
 	if( !pdp_ptr)
 	{
 		req.enable_shift=zinfo->procArray[procId]->procpage_shift;
@@ -1125,6 +1126,7 @@ Address LongModePaging::access(MemReq &req)
 		else{
 			req.enable_shift=zinfo->procArray[procId]->procpage_shift;
 		}
+		table2=ptr;
 		ptr = get_next_level_address<void>((PageTable*)ptr,pd_id);
 		req.cycle += (zinfo->mem_access_time*6);
 		if( ptr )
@@ -1158,7 +1160,7 @@ Address LongModePaging::access(MemReq &req)
 		write_back = true;
 	}
 	return get_block_id(req ,pgt,ptr, pt_id,mode,pbuffer ,
-				set_dirty, write_back ,access_counter);
+				set_dirty, write_back ,access_counter,table2,pd_id);
 }
 
 

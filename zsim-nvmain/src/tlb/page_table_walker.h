@@ -125,6 +125,7 @@ class PageTableWalker: public BasePageTableWalker
 				zinfo->procArray[req.srcId]->setshift(req.enable_shift);
 				if(page)
 				{
+					page->page_shift=req.enable_shift;
 					//TLB shootdown
 					Address vpn = req.lineAddr>>(req.enable_shift)<<((req.enable_shift)-12);
 					tlb_shootdown(req, vpn, tlb_shootdown_overhead );

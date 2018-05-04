@@ -224,6 +224,68 @@ inline Address get_block_id(MemReq& req ,PageTable* pgt, void* pblock , unsigned
 	}
 }
 
+
+inline Address get_block_id(MemReq& req ,PageTable* pgt, void* pblock , unsigned pg_id,
+							PagingStyle mode ,bool pbuffer ,  bool set_dirty, 
+							bool write_back, uint32_t  access_counter,PageTable* pdt,unsigned pd_id)
+{
+	if(!pblock)
+		return INVALID_PAGE_ADDR;
+	else
+	{
+		if( pbuffer)
+		{
+			//unsigned buffer_off = get_buffer_table_off(addr, buffer_table_shift,mode);
+			//point to DRAM buffer block
+			//DRAMBufferBlock* buffer_block = get_next_level_address<DRAMBufferBlock>
+			//								( (PageTable*)pblock , buffer_off);
+			DRAMBufferBlock* buffer_block = (DRAMBufferBlock*)pblock;
+			if( set_dirty )
+			{
+				//((PageTable*)pblock)->entry_array[buffer_off]->set_dirty();
+				//set buffer block to dirty
+				//std::cout<<"set dirty"<<std::endl;
+				assert(pgt);
+				if(pgt->entry_array[pg_id]->PDTEpage_shift==12)//cswhb modified 
+				pgt->entry_array[pg_id]->set_dirty();
+				else if(pgt->entry_array[pg_id]->PDTEpage_shift==17)
+				{
+					for(unsigned i=(pg_id>>5)<<5;i<=(pg_id|0x1f);i++){
+						pgt->entry_array[i]->set_dirty();
+					}
+				}
+				else if(pgt->entry_array[pg_id]->PDTEpage_shift==23){
+					for(unsigned i=0;i<512;i++){
+						pgt->entry_array[i]->set_dirty();
+					}
+					for(unsigned i=(pd_id>>2)<<2;i<=(pd_id|0x3);i++){
+						pdt->entry_array[i]->set_dirty();
+					}
+				}
+				else {
+					
+				}
+				buffer_block->set_dirty();
+			}
+			//req.lineAddr = block_id_to_addr(buffer_block->block_id)>>(zinfo->page_shift);
+			//return buffer_block->get_src_addr();
+			//std::cout<<"ppn:"<<std::hex<<(block_id_to_addr(buffer_block->block_id)>>(zinfo->page_shift))<<std::endl;
+			req.childId = buffer_block->is_dirty();
+			return block_id_to_addr(buffer_block->block_id)>>(zinfo->page_shift);
+		}
+		else
+		{
+			if( write_back)
+			{
+				//overlap field
+				((Page*)pblock)->set_overlap(access_counter );
+			}
+			req.childId = ((Page*)pblock)->get_overlap();
+			//std::cout<<"ppn2:"<<(((Page*)pblock)->pageNo)<<std::endl;
+			return ((Page*)pblock)->pageNo;
+		}
+	}
+}
 /*
 inline Address get_block_id(MemReq& req , Address addr , void* pblock ,
 							unsigned buffer_table_shift, PagingStyle mode ,
