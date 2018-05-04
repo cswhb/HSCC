@@ -34,24 +34,48 @@ class HotMonitorTlb: public BaseTlb
 		/*******TLB access related functions************/		
 		uint64_t access(MemReq& req)
 		{
+			uint64_t rank[3],index[24];
+			rank[0]=12;
+			rank[1]=17;
+			rank[2]=23;
+			index[12]=0;
+			index[17]=1;
+			index[23]=2;
 			ordinary_tlb->tlb_access_time++;
+			uint32_t procid=seq.srcId;
+			uint64_t maxpage_shift=zinfo->procArray[procid]->procmax_shift;
 			Address virt_addr = req.lineAddr;
-			Address offset = virt_addr &(zinfo->page_size-1);
-			Address vpn = virt_addr >>(zinfo->page_shift);
+			uint64_t pagesize=1<<maxpage_shift;
+			uint64_t pageshift=maxpage_shift;
+			T* entry=NULL; 
+			Address offset = virt_addr &(pagesize-1);
+			Address vpn = virt_addr >>(pageshift);
 			Address ppn;
-			T* entry = ordinary_tlb->look_up(vpn);
-			uint32_t access_counter = 0;
+			for(uint64_t i=index[maxpage_shift];i>0;i--){
+				pageshift=rank[i];
+				pagesize= 1<<pageshift£» 
+				offset = virt_addr &(pagesize-1);
+			    vpn = (virt_addr >>(pageshift))<<(pageshift);
+			    entry= ordinary_tlb->look_up(vpn);
+			    if(entry){
+			    	if(entry->TLBpage_shift==pageshift)break;
+			    	else entry=NULL;
+				}
+			}
+			uint32_t access_counter = 0; 
 			uint32_t origin_child_id = req.childId;
 			//tlb miss
 			if( !entry )
 			{
 				ppn = ordinary_tlb->page_table_walker->access(req);
+				vpn=(virt_addr>>(req.enable_shift)<<(req.enable_shift);
+				offset=virt_addr &((1<<req.enable_shift)-1);
 				if( zinfo->multi_queue)
 				{
 					access_counter = req.childId; 
 				}
 				debug_printf("hot monitor insert (%llx,%llx)",vpn,ppn);
-				insert(vpn,ppn, access_counter);
+				insert(vpn,ppn, req.enable_shift,access_counter);
 			}
 			//tlb hit
 			else
@@ -64,11 +88,11 @@ class HotMonitorTlb: public BaseTlb
 				{	
 					entry->set_dirty();
 					MemReq wt_req;
-					wt_req.lineAddr = entry->v_page_no<<(zinfo->page_shift);
+					wt_req.lineAddr = entry->v_page_no;
 					wt_req.cycle = req.cycle;
 					wt_req.type = SETDIRTY;
 					ordinary_tlb->page_table_walker->write_through(wt_req);
-					Address block_id = dram_addr_to_block_id( (entry->p_page_no)<<(zinfo->page_shift));
+					Address block_id = dram_addr_to_block_id( (entry->p_page_no));
 					ordinary_tlb->page_table_walker->convert_to_dirty( block_id );
 				}
 				if( entry->is_in_dram() )
@@ -81,7 +105,7 @@ class HotMonitorTlb: public BaseTlb
 			}
 			req.childId = origin_child_id;
 			req.cycle += ordinary_tlb->response_latency;
-			return  ((ppn<<zinfo->page_shift)|offset);
+			return  ((ppn)|offset);
 		}
 
 		const char* getName()
@@ -172,7 +196,7 @@ class HotMonitorTlb: public BaseTlb
 		T* insert( Address vpage_no ,Address ppn , uint32_t access_counter)
 		{
 			//DRAM buffer TLB 
-			if( (ppn << zinfo->page_shift) >= zinfo->high_addr )
+			if( (ppn ) >= zinfo->high_addr )
 			{
 				T entry(vpage_no, ppn , true);
 				entry.remap( ppn,true);
@@ -195,7 +219,32 @@ class HotMonitorTlb: public BaseTlb
 			}
 			return NULL;
 		}
-
+        T* insert( Address vpage_no ,Address ppn ,uint64_t pageshift, uint32_t access_counter)
+		{
+			//DRAM buffer TLB 
+			if( (ppn) >= zinfo->high_addr )
+			{
+				T entry(vpage_no, ppn ,pageshift, true);
+				entry.remap( ppn,true);
+				if( access_counter == 1)
+				{
+					//std::cout<<"set dirty in tlb"<<std::endl;
+					entry.set_dirty();
+				}
+				dram_tlb_miss++;
+				return ordinary_tlb->insert( vpage_no , entry);
+			}
+			//PCM main memory Tlb
+			else
+			{
+				T entry(vpage_no,ppn ,pageshift, false);
+				if( zinfo->multi_queue)
+					entry.set_counter( access_counter);
+				pcm_tlb_miss++;
+				return ordinary_tlb->insert( vpage_no , entry);
+			}
+			return NULL;
+		}
 		bool remap_ppn(Address page_no , T* entry, bool is_dram=true )
 		{
 			debug_printf("remap (%llx , %llx , %llx)",page_no , entry->v_page_no , entry->p_page_no);

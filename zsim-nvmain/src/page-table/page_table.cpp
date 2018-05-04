@@ -1549,7 +1549,9 @@ bool LongModePaging::remove_page_table(Address addr , Address size)
 		remove_page_table( pml4_entry , pdp_entry , pd_entry+i);
 	return true;
 }
-
+bool LongModePaging::set_enable_shift(){
+	
+}
 bool LongModePaging::remove_page_table( triple_list high_level_entry)
 {
 	for( triple_list_ptr it = high_level_entry.begin(); it!=high_level_entry.end();it++)

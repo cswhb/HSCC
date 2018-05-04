@@ -85,6 +85,7 @@ struct MemReq {
     AccessType type;	
     uint32_t childId;
     uint64_t enable_shift;
+    //alloc pagesize; 
     MESIState* state;
     uint64_t cycle; //cycle where request arrives at component
 
