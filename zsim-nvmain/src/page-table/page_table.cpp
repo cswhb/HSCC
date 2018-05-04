@@ -885,7 +885,7 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		}
 		if( !is_valid(table, pt) )	
 			mapped_entry = (*table)[pt];
-		validate_entry<PageTable>(table , pt , pg_ptr, pbuffer);
+		validate_entry(table , pt , pg_ptr, pbuffer);
 		(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
 		if((*table)[pt]->PDTEpage_shift==12){
 			mask=0x1f;
@@ -1021,7 +1021,7 @@ bool LongModePaging::unmap_page_table( Address addr)
 			return false;
 		}
 		if((table->entry_array[pt_id])->PDTEpage_shift==23){
-			invalidate_entry(table2,pd_entry_id);
+			invalidate_entry<PageTable>(table2,pd_entry_id);
 			for(unsigned i=pd_entry_id;i<=(pd_entry_id|0x3);i++){
 				table2->entry_array[i]=table2->entry_array[pd_entry_id];
 			}
