@@ -145,7 +145,7 @@ class PageTableWalker: public BasePageTableWalker
 						pcm_map_overhead += overhead;
 						req.cycle += overhead;
 					}
-					allocated_page++;
+					allocated_page+=1<<(req.enable_shift-12);//cswhb modified
 					return page->pageNo;
 				}
 			}
