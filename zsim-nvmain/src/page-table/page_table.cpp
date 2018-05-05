@@ -909,7 +909,7 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 				*((*table)[i])=*((*table)[pt]);
 			}
 			for(unsigned i =new_pd;i<=(pd|mask);i++){
-				*((*table)[i])=*((*table)[pd]);
+				*((*table2)[i])=*((*table2)[pd]);
 			}
 		}
 		else {

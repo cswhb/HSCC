@@ -43,6 +43,8 @@ class HotMonitorTlb: public BaseTlb
 			index[17]=1;
 			index[23]=2;
 			ordinary_tlb->tlb_access_time++;
+			uint32_t backsrcId=req.srcId;
+			req.srcId=0;
 			uint32_t procid=req.srcId;
 			uint64_t maxpage_shift=zinfo->procArray[procid]->procmax_shift;
 			Address virt_addr = req.lineAddr;
@@ -71,6 +73,7 @@ class HotMonitorTlb: public BaseTlb
 				ppn = ordinary_tlb->page_table_walker->access(req);
 				vpn=(virt_addr>>(req.enable_shift))<<(req.enable_shift-12);
 				offset=virt_addr &((1<<(req.enable_shift))-1);
+				pageshift=req.enable_shift; 
 				if( zinfo->multi_queue)
 				{
 					access_counter = req.childId; 
@@ -106,7 +109,8 @@ class HotMonitorTlb: public BaseTlb
 			}
 			req.childId = origin_child_id;
 			req.cycle += ordinary_tlb->response_latency;
-			return  ((ppn)|offset);
+			req.srcId=backsrcId;
+			return  ((ppn<<pageshift)|offset);
 		}
 
 		const char* getName()
