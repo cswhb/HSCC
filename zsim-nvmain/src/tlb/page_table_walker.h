@@ -123,7 +123,7 @@ class PageTableWalker: public BasePageTableWalker
 		    Page* page = NULL;
 			if( zinfo->buddy_allocator)
 			{
-				page = zinfo->buddy_allocator->allocate_pages(0,req.enable_shift-12);
+				page = zinfo->buddy_allocator->allocate_pages(0,0,req.enable_shift-12);
 				zinfo->procArray[req.srcId]->setshift(req.enable_shift);
 				if(page)
 				{

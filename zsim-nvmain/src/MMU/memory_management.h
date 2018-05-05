@@ -25,6 +25,7 @@ class BuddyAllocator
 		/***allocate pages according to gfp_mask***/
 		Page* allocate_pages( Zone* zone , unsigned order);
 		Page* allocate_pages( unsigned int gfp_mask , unsigned order = 0 );
+		Page* allocate_pages( unsigned int gfp_mask , unsigned int nouse,unsigned order = 0 );//cswhb added
 		Address get_free_pages( unsigned int gfp_mask , unsigned order=0);
 		Address get_dma_pages( unsigned int gfp_mask , unsigned order=0);
 

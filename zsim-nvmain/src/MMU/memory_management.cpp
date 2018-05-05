@@ -55,6 +55,33 @@ Page* BuddyAllocator::allocate_pages( unsigned int gfp_mask , unsigned order )
 	}
 }
 
+//cswhb added
+Page* BuddyAllocator::allocate_pages( unsigned int gfp_mask ,unsigned nouse, unsigned order )
+{
+	if( order>=MAXORDER )
+	{
+		return NULL;
+	}
+	futex_lock(&buddy_lock);
+	Zone* zone = gfp_zone( gfp_mask );
+	if( zone )
+	{
+		Page* page = allocate_pages(zone , order);
+		if(page==NULL)
+			std::cout<<"allocate failed inner"<<std::endl;
+		//else
+			//std::cout<<"page no:"<<std::hex<<page->pageNo<<std::endl;
+		else page->page_shift=order+12; //cswhb modified
+		futex_unlock(&buddy_lock);
+		return page;
+	}
+	else
+	{
+		futex_unlock(&buddy_lock);
+		return NULL;
+		panic("system has no zone specified by gfp_mask");
+	}
+}
 
 Address BuddyAllocator::get_free_pages(unsigned int gfp_mask , unsigned order)
 {
