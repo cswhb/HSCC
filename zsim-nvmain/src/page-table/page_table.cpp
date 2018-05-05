@@ -1070,6 +1070,8 @@ bool LongModePaging::unmap_page_table( Address addr)
 Address LongModePaging::access(MemReq &req)
 {
 	Address addr = req.lineAddr;
+    uint32_t backsrcId=req.srcId;
+	req.srcId=0; 
 	unsigned pml4_id,pdp_id,pd_id,pt_id;
 	bool pbuffer = false;
 	uint32_t procId= req.srcId;
@@ -1081,6 +1083,7 @@ Address LongModePaging::access(MemReq &req)
 	if( !pdp_ptr)
 	{
 		req.enable_shift=zinfo->procArray[procId]->procpage_shift;
+		req.srcId=backsrcId;
 		return PAGE_FAULT_SIG;
 	}
 	if( mode == LongMode_Huge)
@@ -1096,6 +1099,7 @@ Address LongModePaging::access(MemReq &req)
 	if( !ptr )
 	{
 		req.enable_shift=zinfo->procArray[procId]->procpage_shift;
+		req.srcId=backsrcId;
 		return PAGE_FAULT_SIG;
 	}
 	if( mode == LongMode_Middle)
@@ -1111,6 +1115,7 @@ Address LongModePaging::access(MemReq &req)
 		req.cycle += (zinfo->mem_access_time*5);
 		if( !ptr )
 		{
+			req.srcId=backsrcId;
 			return PAGE_FAULT_SIG;
 		}
 	}
@@ -1140,6 +1145,7 @@ Address LongModePaging::access(MemReq &req)
 		}
 		if( !ptr )
 		{
+			req.srcId=backsrcId;
 			return PAGE_FAULT_SIG;
 		}
 		pgt = (PageTable*)ptr;
@@ -1147,6 +1153,7 @@ Address LongModePaging::access(MemReq &req)
 		ptr = get_next_level_address<void>((PageTable*)ptr,pt_id);
 		if( !ptr )
 		{
+			req.srcId=backsrcId;
 			return PAGE_FAULT_SIG;
 		}
 	}
@@ -1160,8 +1167,10 @@ Address LongModePaging::access(MemReq &req)
 		access_counter = req.childId;
 		write_back = true;
 	}
-	return get_block_id(req ,pgt,ptr, pt_id,mode,pbuffer ,
+	Address ans= get_block_id(req ,pgt,ptr, pt_id,mode,pbuffer ,
 				set_dirty, write_back ,access_counter,table2,pd_id);
+    req.srcId=backsrcId;
+    return ans;
 }
 
 
