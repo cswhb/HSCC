@@ -35,13 +35,13 @@ class HotMonitorTlb: public BaseTlb
 		/*******TLB access related functions************/		
 		uint64_t access(MemReq& req)
 		{
-			uint64_t rank[3],index[24];
-			rank[0]=12;
-			rank[1]=17;
-			rank[2]=23;
-			index[12]=0;
-			index[17]=1;
-			index[23]=2;
+			uint64_t rank[4],index[24];
+			rank[1]=12;
+			rank[2]=17;
+			rank[3]=23;
+			index[12]=1;
+			index[17]=2;
+			index[23]=3;
 			ordinary_tlb->tlb_access_time++;
 			uint32_t backsrcId=req.srcId;
 			req.srcId=0;
