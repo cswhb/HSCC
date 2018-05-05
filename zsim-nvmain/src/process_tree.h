@@ -120,7 +120,7 @@ class ProcessTreeNode : public GlobAlloc {
         	index[17]=2;
         	index[23]=3;
         	procmem_size+=1<<shift;
-        	if(procmem_size <=procpage_size*256/2 &&procpage_shift>12){
+        	if(procpage_shift>12&&procmem_size <=(1<<rank[index[procpage_shift]-1])*256/2 ){
         		//delete these will make procpage_size never decrease; 
         		procpage_shift=rank[index[procpage_shift]-1];
         		procpage_size=1<<procpage_shift;
