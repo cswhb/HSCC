@@ -112,15 +112,22 @@ class ProcessTreeNode : public GlobAlloc {
             return patchRoot;
         }
         void setshift(uint64_t shift){
+        	uint64_t rank[4],index[24];
+        	rank[1]=12;
+        	rank[2]=17;
+        	rank[3]=23;
+        	index[12]=1;
+        	index[17]=2;
+        	index[23]=3;
         	procmem_size+=1<<shift;
         	if(procmem_size <=procpage_size*256/2 &&procpage_shift>12){
         		//delete these will make procpage_size never decrease; 
-        		procpage_size/=2;
-        		procpage_shift-=1;
+        		procpage_shift=rank[index[procpage_shift]-1];
+        		procpage_size=1<<procpage_shift;
 			}
-        	else if(procmem_size>=procpage_size*256 && procpage_shift<22){
-        		procpage_size*=2;
-        		procpage_shift+=1;
+        	else if(procmem_size>=procpage_size*256 && procpage_shift<23){
+        		procpage_shift=rank[index[procpage_shift]+1];;
+        		procpage_size=1<<procpage_shift;
         		if(procmax_shift<procpage_shift){
         			procmax_shift = procpage_shift;
         			procmax_size = procpage_size;
