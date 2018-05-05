@@ -263,11 +263,9 @@ struct GlobSimInfo {
 	g_unordered_map<uint32_t, g_list<Content*> > reversed_pgt;
 	lock_t reversed_pgt_lock; 
 	unsigned mem_access_time;
-	uint64_t procpage_shift;
-    uint64_t procmem_size;
-    uint64_t procmax_shift;
-    uint64_t procmax_size;
-    uint64_t procpage_size;
+	uint64_t pagenum_12;
+    uint64_t pagenum_17;
+    uint64_t pagenum_23;
 };
 
 

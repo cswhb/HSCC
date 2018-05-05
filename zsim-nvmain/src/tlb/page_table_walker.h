@@ -123,10 +123,13 @@ class PageTableWalker: public BasePageTableWalker
 		    Page* page = NULL;
 			if( zinfo->buddy_allocator)
 			{
-				page = zinfo->buddy_allocator->allocate_pages(req.enable_shift-12);
+				page = zinfo->buddy_allocator->allocate_pages(0,req.enable_shift-12);
 				zinfo->procArray[req.srcId]->setshift(req.enable_shift);
 				if(page)
 				{
+					if(req.enable_shift==12)zinfo->pagenum_12++;
+					else if(req.enable_shift==17)zinfo->pagenum_17++;
+					else if(req.enable_shift==23)zinfo->pagenum_23++;
 					page->page_shift=req.enable_shift;
 					//TLB shootdown
 					Address vpn = (req.lineAddr>>(req.enable_shift))<<((req.enable_shift)-12);
