@@ -3,7 +3,7 @@
 #include "galloc.h"
 struct DRAMBufferBlock: public GlobAlloc
 {
-	//uint32_t block_size;
+	uint64_t block_shift;
 	uint16_t flag;
 	unsigned hotness;
 	unsigned max_queue;
