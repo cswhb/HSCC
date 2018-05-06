@@ -1052,7 +1052,7 @@ bool LongModePaging::unmap_page_table( Address addr)
 				mask=0x1f;
 				(*table)[pt_id]->used[pd_id&0x3]=0;
 				(*table)[pt_id&(~mask)]->usedup-=1<<12;
-				if((*table)[pt_id&(~mask)]->usedup()==0){
+				if((*table)[pt_id&(~mask)]->usedup==0){
 					invalidate_page(table,pt_entry_id);
 			        for(unsigned i=pt_entry_id;i<=(pt_entry_id|0x1f);i++){
 				        table->entry_array[i]=table->entry_array[pt_entry_id];
