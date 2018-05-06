@@ -31,10 +31,19 @@ class BasePDTEntry: public GlobAlloc
 			set_user();	//default user can access all page
 			PDTEpage_shift=zinfo->page_shift;
 			hugepage_enable=0;
+			usedup=0;
+			used[0]=0;
+			used[1]=0;
+			used[2]=0;
+			used[3]=0;
 			//default is cache write back,cacheable,unaccessed,clear,page_size is 4KB, local page
 		}
 		BasePDTEntry(void* ppt):next_level_ptr(ppt)
-		{ entry_bits = 0;PDTEpage_shift=zinfo->page_shift;hugepage_enable=0;}
+		{ entry_bits = 0;PDTEpage_shift=zinfo->page_shift;hugepage_enable=0;usedup=0;
+			used[0]=0;
+			used[1]=0;
+			used[2]=0;
+			used[3]=0;}
 		virtual ~BasePDTEntry(){};
 	
 		void validate( void* next_level_addr , bool is_buffer = false )
@@ -215,6 +224,8 @@ class BasePDTEntry: public GlobAlloc
 		unsigned entry_bits;
 		uint64_t PDTEpage_shift; 
 		unsigned hugepage_enable;
+		uint64_t usedup ;
+		uint64_t used[4];
 };
 
 /*---------structure of page table--------*/
