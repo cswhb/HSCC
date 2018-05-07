@@ -163,7 +163,7 @@ void BuddyAllocator::free_pcppages_bulk(Zone* zone , unsigned int count , PerCpu
 		page = pcp->page_list.front();
 		pcp->page_list.pop_front();	//delete page
 		pcp->count++;
-		free_one_page(zone,(page->pageNo),0);  
+		free_one_page(zone,(page->pageNo),page->page_shift-12);//cswhb modified  
 	}
 }
 
@@ -177,6 +177,7 @@ unsigned BuddyAllocator::allocate_bulk(Zone* zone , unsigned int order , uint64_
 		//page allocate failed
 		if( unlikely(page==NULL) )
 			break;
+		page->page_shift=order+12;//cswhb added 
 		list.push_back(page);
 	}
 	return i;	//return allocated page
@@ -192,6 +193,7 @@ Page* BuddyAllocator::allocate_pages(Zone* zone , unsigned order)
 	assert(mem_node);
 	//get the page can be allocated
 	Page* page = rmqueue_page_smallest( mem_node,zone,order);	
+	if(page)page->page_shift=order+12;//cswhb added 
 	return page;
 }
 
@@ -330,6 +332,7 @@ Page* BuddyAllocator::buffered_rmqueue( unsigned int gfp_mask , Zone* zone , uns
     if( !page || pps->page_list.empty() || unlikely(order!=0))
 	{
 		page = allocate_pages( zone , order); 
+		if(page)page->page_shift=order+12;
 	}
 	return page;
 }
