@@ -265,7 +265,7 @@ struct GlobSimInfo {
 	unsigned mem_access_time;
 	uint64_t pagenum_12;
     uint64_t pagenum_17;
-    uint64_t pagenum_23;
+    uint64_t pagenum_22;
 };
 
 

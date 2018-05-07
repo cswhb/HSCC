@@ -891,24 +891,24 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 			mask=0x1f;
 			new_pt=pt&(~mask);
 			(*table)[new_pt]->hugepage_enable+=4*1024;
-			(*table2)[(pd>>2)<<2]->hugepage_enable+=4*1024;
+			(*table2)[(pd>>1)<<1]->hugepage_enable+=4*1024;
 		}
 		else if((*table)[pt]->PDTEpage_shift==17){
 			mask=0x1f;
 			new_pt=pt&(~mask);
-			(*table2)[(pd>>2)<<2]->hugepage_enable+=1<<17;
+			(*table2)[(pd>>1)<<1]->hugepage_enable+=1<<17;
 			for(unsigned i =new_pt;i<=(pt|mask);i++){
 				*((*table)[i])=*((*table)[pt]);
 			}
 			
 			(*table)[new_pt]->usedup=1<<12;
-			(*table)[pt]->used[pd&0x3]=1;
+			(*table)[pt]->used[pd&0x1]=1;
 		}
 		else if((*table)[pt]->PDTEpage_shift==23){
 			(*table2)[pd]->PDTEpage_shift=23;
 			mask=0x1f;
 			new_pt=pt&(~mask);
-			mask=0x3;
+			mask=0x1;
 			new_pd=pd&(~mask);
 			for(unsigned i =0;i<512;i++){
 				*((*table)[i])=*((*table)[pt]);
@@ -917,7 +917,7 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 				*((*table2)[i])=*((*table2)[pd]);
 			}
 			(*table2)[new_pd]->usedup=1<<12;
-			(*table)[pt]->used[pd&0x3]=1;
+			(*table)[pt]->used[pd&0x1]=1;
 		}
 		else {
 			debug_printf("error map page_shift");
@@ -1021,36 +1021,36 @@ bool LongModePaging::unmap_page_table( Address addr)
 	{
 		table = get_tables(3, entry_id_vec);
 		table2 = get_tables(2, entry_id_vec);
-		unsigned pd_entry_id=(pd_id>>2)<<2;
+		unsigned pd_entry_id=(pd_id>>1)<<1;
 		unsigned pt_entry_id=(pt_id>>5)<<5;
 		if( !table )
 		{
 			debug_printf("didn't find entry indexed with %ld !",addr);
 			return false;
 		}
-		if((table->entry_array[pt_id])->PDTEpage_shift==23){
-			if((*table)[pt_id]->used[pd_id&0x3]==0){
+		if((table->entry_array[pt_id])->PDTEpage_shift==22){
+			if((*table)[pt_id]->used[pd_id&0x1]==0){
 				info("unmap error");
 			}
 			else {
-				mask=0x3;
-				((*table)[pt_id])->used[pd_id&0x3]=0;
+				mask=0x1;
+				((*table)[pt_id])->used[pd_id&0x1]=0;
 				((*table2)[pd_id&(~mask)])->usedup-=1<<12;
 				if(((*table2)[pd_id&(~mask)])->usedup==0) {
 					invalidate_entry<PageTable>(table2,pd_entry_id);
-			        for(unsigned i=pd_entry_id;i<=(pd_entry_id|0x3);i++){
+			        for(unsigned i=pd_entry_id;i<=(pd_entry_id|0x1);i++){
 				        table2->entry_array[i]=table2->entry_array[pd_entry_id];
 			        }
 				}
 			}
 		}
 		else if((table->entry_array[pt_id])->PDTEpage_shift==17){
-			if(((*table)[pt_id])->used[pd_id&0x3]==0){
+			if(((*table)[pt_id])->used[pd_id&0x1]==0){
 				info("unmap error");
 			}
 			else{
 				mask=0x1f;
-				((*table)[pt_id])->used[pd_id&0x3]=0;
+				((*table)[pt_id])->used[pd_id&0x1]=0;
 				((*table)[pt_id&(~mask)])->usedup-=1<<12;
 				if(((*table)[pt_id&(~mask)])->usedup==0){
 					invalidate_page(table,pt_entry_id);
@@ -1152,7 +1152,7 @@ Address LongModePaging::access(MemReq &req)
 		assert( pd_id != (unsigned)(-1));
 		assert( pt_id != (unsigned)(-1));
 		//point to page table
-		if(((*((PageTable*)ptr))[(pd_id>>2)<<2])->hugepage_enable>0){
+		if(((*((PageTable*)ptr))[(pd_id>>1)<<1])->hugepage_enable>0){
 			if(zinfo->procArray[procId]->procpage_shift>=17)
 			req.enable_shift=17;
 			else req.enable_shift=12;
@@ -1184,14 +1184,14 @@ Address LongModePaging::access(MemReq &req)
 			req.srcId=backsrcId;
 			return PAGE_FAULT_SIG;
 		}
-		if((*((PageTable*)pgt))[pt_id]->used[pd_id&0x3]==0&&(*((PageTable*)pgt))[pt_id]->PDTEpage_shift!=12){
-			(*((PageTable*)pgt))[pt_id]->used[pd_id&0x3]=1;
+		if((*((PageTable*)pgt))[pt_id]->used[pd_id&0x1]==0&&(*((PageTable*)pgt))[pt_id]->PDTEpage_shift!=12){
+			(*((PageTable*)pgt))[pt_id]->used[pd_id&0x1]=1;
 			if((*((PageTable*)pgt))[pt_id]->PDTEpage_shift==17){
 				mask=0x1f;
 				(*((PageTable*)pgt))[pt_id&(!mask)]->usedup+=1<<12;
 			}
 			else {
-				mask=0x3;
+				mask=0x1;
 				(*((PageTable*)table2))[pd_id&(!mask)]->usedup+=1<<12;
 			}
 		} 

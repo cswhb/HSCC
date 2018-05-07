@@ -262,9 +262,9 @@ class CommonTlb: public BaseTlb
 				   deleted = true;
 			    }
 			    else {
-			    	tmp_vpn=((vpage_no)>>11)<<11;
+			    	tmp_vpn=((vpage_no)>>10)<<10;
 				    delete_entry=look_up(tmp_vpn);
-				    if(delete_entry && delete_entry->TLBpage_shift==23)
+				    if(delete_entry && delete_entry->TLBpage_shift==22)
 			        {
 				      tlb_trie.erase( delete_entry->v_page_no);
 				      tlb_trie_pa.erase( delete_entry->p_page_no);

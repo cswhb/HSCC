@@ -10,7 +10,7 @@
 #include "stdint.h"
 #define MAXLEN 1024
 #define SWAP_CLUSTER_MAX (32ULL)
-#define MAXORDER 12
+#define MAXORDER 11
 #define PAGE_BUDDY_MAPCOUNT_VALUE (-128)		//if page is belong to buddy system, its mapcount should be -128
 
 /* Addresses are plain 64-bit uints. This should be kept compatible with PIN addrints */

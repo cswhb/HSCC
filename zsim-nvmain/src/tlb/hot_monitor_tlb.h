@@ -38,10 +38,10 @@ class HotMonitorTlb: public BaseTlb
 			uint64_t rank[4],index[24];
 			rank[1]=12;
 			rank[2]=17;
-			rank[3]=23;
+			rank[3]=22;
 			index[12]=1;
 			index[17]=2;
-			index[23]=3;
+			index[22]=3;
 			ordinary_tlb->tlb_access_time++;
 			uint32_t backsrcId=req.srcId;
 			req.srcId=0;
@@ -169,6 +169,7 @@ class HotMonitorTlb: public BaseTlb
 			info("pcm tlb hit part(+dram tlb hit part=total hit part):%.5f",pcm_tlb_hit_part);
 			info("dram tlb hit rate(dram TLB hit to all dram TLB access):%.5f",dram_tlb_hit_rate);
 			info("pcm tlb hit rate(PCM TLB hit to all PCM TLB access):%.5f",pcm_tlb_hit_rate);
+			info("pagenum_12:%ld,pagenum_17:%ld,pagenum_22:%ld",zinfo->pagenum_12,zinfo->pagenum_17,zinfo->pagenum_22);
 			return ordinary_tlb->calculate_stats();
 		}
 		

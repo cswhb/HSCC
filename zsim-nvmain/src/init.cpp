@@ -1124,7 +1124,7 @@ void SimInit(const char* configFile, const char* outputDir, uint32_t shmid) {
     zinfo = gm_calloc<GlobSimInfo>();
     zinfo->pagenum_12=0;
     zinfo->pagenum_17=0;
-    zinfo->pagenum_23=0;
+    zinfo->pagenum_22=0;
 	//set log file path
     zinfo->outputDir = gm_strdup(outputDir);
     Config config(configFile);

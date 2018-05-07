@@ -255,11 +255,11 @@ inline Address get_block_id(MemReq& req ,PageTable* pgt, void* pblock , unsigned
 						pgt->entry_array[i]->set_dirty();
 					}
 				}
-				else if(pgt->entry_array[pg_id]->PDTEpage_shift==23){
+				else if(pgt->entry_array[pg_id]->PDTEpage_shift==22){
 					for(unsigned i=0;i<512;i++){
 						pgt->entry_array[i]->set_dirty();
 					}
-					for(unsigned i=(pd_id>>2)<<2;i<=(pd_id|0x3);i++){
+					for(unsigned i=(pd_id>>1)<<1;i<=(pd_id|0x1);i++){
 						pdt->entry_array[i]->set_dirty();
 					}
 				}
