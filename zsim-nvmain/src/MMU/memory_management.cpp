@@ -85,7 +85,7 @@ Page* BuddyAllocator::allocate_pages( unsigned int gfp_mask ,unsigned nouse, uns
 
 Address BuddyAllocator::get_free_pages(unsigned int gfp_mask , unsigned order)
 {
-	return (allocate_pages(gfp_mask,order)->pageNo)>>(zinfo->page_shift);
+	return (allocate_pages(gfp_mask,0,order)->pageNo)>>(zinfo->page_shift);
 }
 
 

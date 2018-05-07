@@ -185,9 +185,9 @@ class HotMonitorTlb: public BaseTlb
 				if(result_node ->TLBpage_shift!=17)result_node=NULL;
 			}
 			if(!result_node){
-				if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>11)<<11)){	
-				    result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>11)<<11];
-				    if(result_node ->TLBpage_shift!=23)result_node=NULL;
+				if( ordinary_tlb->tlb_trie_pa.count((p_page_no>>10)<<10)){	
+				    result_node =(ordinary_tlb->tlb_trie_pa)[(p_page_no>>10)<<10];
+				    if(result_node ->TLBpage_shift!=22)result_node=NULL;
 			    }
 			}
 			over_thres = unOverThres;

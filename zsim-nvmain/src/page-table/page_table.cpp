@@ -904,8 +904,8 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 			(*table)[new_pt]->usedup=1<<12;
 			(*table)[pt]->used[pd&0x1]=1;
 		}
-		else if((*table)[pt]->PDTEpage_shift==23){
-			(*table2)[pd]->PDTEpage_shift=23;
+		else if((*table)[pt]->PDTEpage_shift==22){
+			(*table2)[pd]->PDTEpage_shift=22;
 			mask=0x1f;
 			new_pt=pt&(~mask);
 			mask=0x1;
