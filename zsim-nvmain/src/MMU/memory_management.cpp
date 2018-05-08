@@ -150,6 +150,13 @@ void BuddyAllocator::free_one_page( Zone* zone ,
 	zone->free_area[order].nr_free++;
 }
 
+//cswhb added free page with gfp_mask
+void BuddyAllocator::free_pages( unsigned int gfp_mask ,
+							uint64_t page_no , unsigned order)
+{
+	Zone* zone = gfp_zone( gfp_mask );
+	free_one_page( zone , page_no ,  order);
+}
 /*
  *@function: free a number of pages from pcp lists
  *@count: number of pages to be freed from pcp list

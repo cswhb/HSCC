@@ -11,6 +11,7 @@
 #include "g_std/g_unordered_set.h"
 #include "memory_hierarchy.h"
 #include "DRAM-buffer/DRAM_buffer_block.h"
+#include "MMU/memory_management.h"  //cswhb added
 class FairAllocator: public BaseDRAMBufferManager 
 {
 	public:
@@ -26,6 +27,8 @@ class FairAllocator: public BaseDRAMBufferManager
 		bool should_cherish();
 		bool should_more_cherish();
 		virtual DRAMBufferBlock* get_page_ptr( uint64_t entry_id );
+		BuddyAllocator* DRAM_buddy_allocator;//cswhb added
+		MemoryNode* DRAM_mem_node;//cswhb added
 	private:
 		void fairness_evict();
 		void equal_evict();

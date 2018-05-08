@@ -107,6 +107,7 @@ class MemoryNode
 	public:
 	MemoryNode( unsigned id , Address start_addr );
 	~MemoryNode();
+	bool reset_zone();//cswhb added 
 	bool zone_exists( std::string zone_name)
 	{
 		if( node_zones[string_to_zonetype(zone_name)] )

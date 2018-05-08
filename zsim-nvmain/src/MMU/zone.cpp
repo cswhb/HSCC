@@ -150,6 +150,20 @@ MemoryNode::MemoryNode( unsigned id , Address start_addr=0):
 	setup_per_zone_wmarks();
 }
 
+//cswhb added
+//set dram zone 
+MemoryNode::reset_zone(uint64_t size){
+	zone_highest_possible[2]=size;
+	zone_lowest_possible[MAX_NR_ZONES-1]=size;
+	zone_highest_possible[MAX_NR_ZONES-1]=size;
+	//redo zone setup
+	node_page_num = calculate_total_pages();
+	present_pages = node_page_num;
+	//allocate node_mem_map
+	debug_printf("memory node:redo  allocate node mem map , page num: %lld",node_page_num);
+	init_zones();
+	setup_per_zone_wmarks();
+}
 //you are very important for delete some allocated objects
 //such as zones
 MemoryNode::~MemoryNode()

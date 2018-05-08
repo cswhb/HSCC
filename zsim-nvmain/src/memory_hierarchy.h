@@ -196,7 +196,7 @@ class BaseDRAMBufferManager: public GlobAlloc
 {
 	public:
 		virtual ~BaseDRAMBufferManager(){};
-		virtual DRAMBufferBlock* allocate_one_page( uint32_t proc = INVALID_PROC) { return NULL; }
+		virtual DRAMBufferBlock* allocate_one_page(uint64_t page_shift, uint32_t proc = INVALID_PROC) { return NULL; }
 		virtual double get_memory_usage(){ return 0.0;};
 		virtual void SetBlockDirty( Address block_id){};
 		virtual void convert_to_dirty( unsigned process_id , Address block_id){}

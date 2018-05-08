@@ -33,6 +33,9 @@ class BuddyAllocator
 		/***free pages from specified zone***/
 		void free_one_page( Zone* zone , uint64_t page_no , unsigned order);
 		
+		//cswhb added
+		void free_pages( unsigned int gfp_mask , uint64_t page_no , unsigned order);
+		
 		void free_pcppages_bulk(Zone* zone, unsigned int count , PerCpuPages* pcp);
 		/***per cpu pageset allocate***/
 		Page* buffered_rmqueue( unsigned int gfp_mask , Zone* zone , unsigned order , unsigned cpu_id);
