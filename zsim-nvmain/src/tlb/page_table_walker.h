@@ -163,17 +163,24 @@ class PageTableWalker: public BasePageTableWalker
 			debug_printf("fetch pcm page %d to DRAM",(req.lineAddr>>zinfo->page_shift));
 			
 			//allocate dram buffer block
-			DRAMBufferBlock* dram_block = allocate_page();
+			uint64_t order=0;
+			unsigned index=0;
+			DRAMBufferBlock* dram_block = allocate_page(entry->TLBpage_shift);
 			if( dram_block)
 			{
 				//*clflush nvm pages from on-chip caches
 				bool req_write_back = true;
 				uint64_t write_backs = 0;
-				uint64_t cycle = clflush(req.lineAddr, &req_write_back, req.cycle, coreId, write_backs);
+				uint64_t cycle_back=req.cycle;
+				order=entry->TLBpage_shift-12;
+				index=(req.lineAddr>>order)<<order;
+				for(unsigned i=0;i<(1<<order);i++){
+					req.cycle= clflush(index+i, &req_write_back, req.cycle, coreId, write_backs);
+				}
 				if( write_backs)
 					extra_write += write_backs;
-				clflush_overhead += (cycle - req.cycle);
-				req.cycle = cycle;
+				clflush_overhead += (req.cycle - cycle_back);
+				//req.cycle = cycle;
 				//*1.clflush DRAM pages from on-chip caches
 				//*2.evict dirty DRAM page
 				//*3.tlb shootdown
@@ -268,14 +275,14 @@ class PageTableWalker: public BasePageTableWalker
 			return latency;
 		}
 
-		DRAMBufferBlock* allocate_page( )
+		DRAMBufferBlock* allocate_page( uint64_t shift)
 		{
 			if( zinfo->dram_manager->should_reclaim() )
 			{
 				zinfo->dram_manager->evict( zinfo->dram_evict_policy);
 			}
 			//std::cout<<"allocate page table"<<std::endl;
-			return (zinfo->dram_manager)->allocate_one_page( procIdx);
+			return (zinfo->dram_manager)->allocate_one_page( shift,procIdx);
 		}
 		
 		//#####clflush simulation

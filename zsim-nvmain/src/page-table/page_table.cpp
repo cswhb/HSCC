@@ -886,7 +886,10 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		if( !is_valid(table, pt) )	
 			mapped_entry = (*table)[pt];
 		validate_entry(table , pt , pg_ptr, pbuffer);
+		if(!pbuffer)
 		(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
+		else
+		(*table)[pt]->PDTEpage_shift=((DRAMBufferBlock*)pg_ptr)->block_shift; 
 		if((*table)[pt]->PDTEpage_shift==12){
 			mask=0x1f;
 			new_pt=pt&(~mask);
