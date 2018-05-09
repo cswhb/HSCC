@@ -73,7 +73,7 @@ bool FairAllocator::should_more_cherish()
 	return false;
 }
 
-unsigned FairAllocator::Release( PageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,unsigned process_id, unsigned evict_size )
+unsigned FairAllocator::Release(BasePageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,unsigned process_id, unsigned evict_size )
 {
 	futex_lock(&pool_lock);
 	//evict clean page firs<<std::endl;t
@@ -97,7 +97,7 @@ unsigned FairAllocator::Release( PageTableWalker*p,MemReq& req, DRAMBufferBlock*
 			}
 			else{
 				clean_pools[process_id].erase(t );
-				p->evict_DRAM_page( req,buffer_entry[t] ,entry, coreId, evict);
+				((PageTableWalker<ExtendTlbEntry>*)p)->evict_DRAM_page( req,buffer_entry[t] ,entry, coreId, evict);
 		    	global_clean_pool.push_back(t);
 				busy_pages--;
 				busy_dre++;
@@ -123,7 +123,7 @@ unsigned FairAllocator::Release( PageTableWalker*p,MemReq& req, DRAMBufferBlock*
 			    else{
 				    dirty_pools[process_id].erase(t );
 		    	    global_dirty_pool.push_back(t);
-		    	    p->evict_DRAM_page( req,buffer_entry[t] ,entry, coreId, evict);
+		    	    ((PageTableWalker<ExtendTlbEntry>*)p)->evict_DRAM_page( req,buffer_entry[t] ,entry, coreId, evict);
 				    busy_pages--;
 				    busy_dre++
 				    i++
@@ -173,7 +173,7 @@ DRAMBufferBlock* FairAllocator::get_page_ptr( uint64_t entry_id )
 	return NULL;
 }
 //cswhb modified   return NULL when buddy_alloc failed
-DRAMBufferBlock* FairAllocator::allocate_one_page( PageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id )
+DRAMBufferBlock* FairAllocator::allocate_one_page( BasePageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id )
 {
 	futex_lock(&pool_lock);
 	unsigned order,index;//cswhb added
@@ -262,7 +262,7 @@ void FairAllocator::convert_to_dirty( unsigned process_id , Address block_id )
 	futex_unlock(&pool_lock);
 }
 
-void FairAllocator::evict(PageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,DRAMEVICTSTYLE policy)
+void FairAllocator::evict(BasePageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,DRAMEVICTSTYLE policy)
 {
 	assert( should_reclaim());
 	return equal_evict(p,req,dram_block,entry,core_id,evict);
@@ -272,7 +272,7 @@ void FairAllocator::evict(PageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_b
  *@function:
  *@param:
  */
-void FairAllocator::equal_evict(PageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict  )
+void FairAllocator::equal_evict(PageTableWalker<ExtendTlbEntry>*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict  )
 {
 	int reclaim_pages = min_free_pages-(total_page_count-busy_pages);
 	//reclaim equally

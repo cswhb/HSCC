@@ -281,7 +281,7 @@ class PageTableWalker: public BasePageTableWalker
 			return latency;
 		}
 
-		DRAMBufferBlock* allocate_page(PageTableWalker*p1; MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,uint64_t shift)
+		DRAMBufferBlock* allocate_page(PageTableWalker<ExtendTlbEntry>*p1, MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,uint64_t shift)
 		{
 			if( zinfo->dram_manager->should_reclaim() )
 			{
@@ -319,7 +319,7 @@ class PageTableWalker: public BasePageTableWalker
 			}
 		}
 
-		inline void evict_and_fetch( MemReq& req, DRAMBufferBlock* dram_block,T* entry, bool& evict)
+		inline void evict_and_fetch( MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, bool& evict)
 		{
 			Address origin_ppn = dram_block->get_src_addr();
 			Address dram_addr = block_id_to_addr( dram_block->block_id);
@@ -377,10 +377,10 @@ class PageTableWalker: public BasePageTableWalker
 			hscc_map_overhead += overhead;	
 		}
 		//cswhb added
-		inline void evict_and_fetch_out(MemReq& req, DRAMBufferBlock* dram_block,T* entry, bool& evict){
+		inline void evict_and_fetch_out(MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, bool& evict){
 			Address origin_ppn = dram_block->get_src_addr();
 			Address dram_addr = block_id_to_addr( dram_block->block_id);
-			DRAMBufferBlock*=block;
+			DRAMBufferBlock* block;
 			Address overhead = 0;			
 			uint64_t order;
 			unsigned index;
