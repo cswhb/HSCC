@@ -883,22 +883,13 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 			debug_printf("allocate page table for LongMode_Normal failed!");
 			return false;
 		}
-		if(!pbuffer){
-			(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
-			if(((((Page*)pg_ptr)->pageNo>>(((Page*)pg_ptr)->page_shift-12))<<(((Page*)pg_ptr)->page_shift-12))!=(Page*)pg_ptr)->pageNo)
-			return latency;
-		}
-		
-		else{
-			(*table)[pt]->PDTEpage_shift=((DRAMBufferBlock*)pg_ptr)->block_shift; 
-			if(((((DRAMBufferBlock*)pg_ptr)->block_id>>(((DRAMBufferBlock*)pg_ptr)->block_shift-12))<<(((DRAMBufferBlock*)pg_ptr)->block_shift-12))!=(DRAMBufferBlock*)pg_ptr)->block_id)
-			return latency;
-		}
 		if( !is_valid(table, pt) )	
 			mapped_entry = (*table)[pt];
 		validate_entry(table , pt , pg_ptr, pbuffer);
-		
-		
+		if(!pbuffer)
+		(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
+		else
+		(*table)[pt]->PDTEpage_shift=((DRAMBufferBlock*)pg_ptr)->block_shift; 
 		if((*table)[pt]->PDTEpage_shift==12){
 			mask=0x1f;
 			new_pt=pt&(~mask);

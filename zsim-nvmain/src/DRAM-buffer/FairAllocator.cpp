@@ -173,7 +173,11 @@ DRAMBufferBlock* FairAllocator::get_page_ptr( uint64_t entry_id )
 	return NULL;
 }
 //cswhb modified   return NULL when buddy_alloc failed
+<<<<<<< HEAD
 DRAMBufferBlock* FairAllocator::allocate_one_page( BasePageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id )
+=======
+DRAMBufferBlock* FairAllocator::allocate_one_page( uint64_t page_shift,unsigned process_id )
+>>>>>>> parent of c6a8249... before change allocate_one_page
 {
 	futex_lock(&pool_lock);
 	unsigned order,index;//cswhb added
@@ -183,6 +187,7 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( BasePageTableWalker*p,MemReq&
 	//cswhb modified
 	Page*page=DRAM_buddy_allocator->allocate_pages(0,0,page_shift);
 	while(!page){
+<<<<<<< HEAD
 		for( uint32_t i=0; i< process_count; i++)
 	    {
 		    proc_busy_size = clean_pools[i].size()+dirty_pools[i].size();
@@ -191,6 +196,9 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( BasePageTableWalker*p,MemReq&
 			    Release(p,req,dram_block,entry,core_id,evict, i, 1);
 		    }
 	    }
+=======
+		evict(policy);
+>>>>>>> parent of c6a8249... before change allocate_one_page
 		page=DRAM_buddy_allocator->allocate_pages(0,0,page_shift);
 	}
 	if(!buffer_array.count(page->pageNo)){
@@ -214,8 +222,6 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( BasePageTableWalker*p,MemReq&
 		    futex_unlock(&pool_lock);
 		    return NULL;
 		}
-		buffer_array[index]->block_shift=page->page_shift;
-	    buffer_array[index]->page=(void*)page;
 		clean_pools[process_id].insert(index);
 		busy_pages++;
 		proc_busy_pages[process_id]++;

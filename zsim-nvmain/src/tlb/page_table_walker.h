@@ -165,7 +165,7 @@ class PageTableWalker: public BasePageTableWalker
 			//allocate dram buffer block
 			uint64_t order=0;
 			unsigned index=0;
-			DRAMBufferBlock* dram_block = allocate_page(this,req, dram_block,entry, coreId, evict,entry->TLBpage_shift);
+			DRAMBufferBlock* dram_block = allocate_page(entry->TLBpage_shift);
 			if( dram_block)
 			{
 				//*clflush nvm pages from on-chip caches
@@ -185,13 +185,7 @@ class PageTableWalker: public BasePageTableWalker
 				//*2.evict dirty DRAM page
 				//*3.tlb shootdown
 				//*4.map page table
-				/*order=dram_block->block_shift-12;
-				index=((dram_block->block_id)>>order)<<order;
-				for(unsigned i=0;i<(1<<order);i++){
-					//evict_DRAM_page( req, dram_block,entry, coreId, evict);
-					evict_DRAM_page( req, zinfo->dram_manager->get_page_ptr(index+i),entry, coreId, evict);
-				}*/
-				evict_and_fetch_out(req, dram_block,entry,  evict);
+				evict_DRAM_page( req, dram_block,entry, coreId, evict);
 				
 				 return block_id_to_addr( dram_block->block_id);
 			}
@@ -281,14 +275,18 @@ class PageTableWalker: public BasePageTableWalker
 			return latency;
 		}
 
+<<<<<<< HEAD
 		DRAMBufferBlock* allocate_page(PageTableWalker<ExtendTlbEntry>*p1, MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,uint64_t shift)
+=======
+		DRAMBufferBlock* allocate_page( uint64_t shift)
+>>>>>>> parent of c6a8249... before change allocate_one_page
 		{
 			if( zinfo->dram_manager->should_reclaim() )
 			{
 				zinfo->dram_manager->evict( p1,req,dram_block,entry,core_id,evict,zinfo->dram_evict_policy);
 			}
 			//std::cout<<"allocate page table"<<std::endl;
-			return (zinfo->dram_manager)->allocate_one_page( p1,req,dram_block,entry,core_id,evict,shift,procIdx);
+			return (zinfo->dram_manager)->allocate_one_page( shift,procIdx);
 		}
 		
 		//#####clflush simulation
@@ -324,7 +322,7 @@ class PageTableWalker: public BasePageTableWalker
 			Address origin_ppn = dram_block->get_src_addr();
 			Address dram_addr = block_id_to_addr( dram_block->block_id);
 			//evict
-			if( dram_block->is_occupied() && dram_block->is_dirty())//1
+			if( dram_block->is_occupied() && dram_block->is_dirty())
 			{
 				evict = true;
 				dirty_evict++;
@@ -332,16 +330,15 @@ class PageTableWalker: public BasePageTableWalker
 				//write back dirty DRAM pages to NVM
 				store_page( req, dram_addr, dst_addr, true, NVM::FETCH);
 			}
-			if( dram_block->is_occupied())//1
+			if( dram_block->is_occupied())
 				total_evict++;
 			//call memory controller interface to cache page
-			//store_page( req, req.lineAddr, dram_addr, false, NVM::READ);//1
+			store_page( req, req.lineAddr, dram_addr, false, NVM::READ);
 			Address overhead = 0;			
 			//invalidate dram
-			if( dram_block->is_occupied())//2
+			if( dram_block->is_occupied())
 			{
 				//std::cout<<"evict:"<<dram_addr<<std::endl;
-				if(((dram_block->block_id>>dram_block->block_shift-12)<<dram_block->block_shift-12)==dram_block->block_id){
 				if( zinfo->enable_shared_memory)
 				{
 					overhead = remap_page_table( dram_addr>>(zinfo->page_shift),origin_ppn, true, false);
@@ -352,17 +349,16 @@ class PageTableWalker: public BasePageTableWalker
 					Page* page_ptr = zinfo->memory_node->get_page_ptr(origin_ppn); 
 					overhead = paging->map_page_table((vpn<<zinfo->page_shift),(void*)page_ptr,false);
 				}
-			    }
 				req.cycle += overhead;
 				hscc_map_overhead += overhead;
-				dram_block->invalidate();//1
+				dram_block->invalidate();
 			}
-			/*dram_block->validate(req.lineAddr>>(zinfo->block_shift));//1
-			dram_block->set_src_addr( entry->p_page_no );//1
-			dram_block->set_vaddr( entry->v_page_no);//1
+			dram_block->validate(req.lineAddr>>(zinfo->block_shift));
+			dram_block->set_src_addr( entry->p_page_no );
+			dram_block->set_vaddr( entry->v_page_no);
 			debug_printf("after remap , vpn:%llx , ppn:%llx",entry->v_page_no , entry->p_page_no);
 			//update extended page table
-			if( zinfo->enable_shared_memory )//2
+			if( zinfo->enable_shared_memory )
 			{
 				//std::cout<<"remap page table "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
 				overhead = remap_page_table( entry->p_page_no,dram_addr>>(zinfo->page_shift), false , true);
@@ -372,6 +368,7 @@ class PageTableWalker: public BasePageTableWalker
 				//std::cout<<"remap page table "<<entry->v_page_no<<": "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
 				overhead= paging->map_page_table(( (entry->v_page_no)<<zinfo->page_shift),(void*)dram_block,true);
 			}
+<<<<<<< HEAD
 			*/
 			req.cycle += overhead;
 			hscc_map_overhead += overhead;	
@@ -394,20 +391,9 @@ class PageTableWalker: public BasePageTableWalker
 			    store_page( req, ((req.lineAddr>>(order+12))<<(order+12))+(i<<12), ((dram_addr>>(order+12)<<(order+12)))+(i<<12), false, NVM::READ);//1
 			    debug_printf("after remap , vpn:%llx , ppn:%llx",entry->v_page_no , entry->p_page_no);
 			}
+=======
+>>>>>>> parent of c6a8249... before change allocate_one_page
 			
-			//update extended page table
-			if( zinfo->enable_shared_memory )//2
-			{
-				//std::cout<<"remap page table "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
-				overhead = remap_page_table( entry->p_page_no,dram_addr>>(zinfo->page_shift), false , true);
-			}
-			else
-			{
-				//std::cout<<"remap page table "<<entry->v_page_no<<": "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
-				overhead= paging->map_page_table(( (entry->v_page_no)<<zinfo->page_shift),(void*)dram_block,true);
-			}
-			Address vpage_installed = entry->v_page_no;//2
-			tlb_shootdown_hscc(req, vpage_installed,(dram_addr>>zinfo->page_shift), hscc_tlb_shootdown, true);
 			req.cycle += overhead;
 			hscc_map_overhead += overhead;	
 		}
@@ -495,7 +481,7 @@ class PageTableWalker: public BasePageTableWalker
 				Address dram_addr = block_id_to_addr( dram_block->block_id);
 				bool req_write_back = true;
 				//evict dram_block if it's dirty
-				if( dram_block->is_occupied())//1
+				if( dram_block->is_occupied())
 				{
 					//#cache clflush: DRAM cache block
 					//std::cout<<std::hex<<dram_addr<<" is occupied, clflush cache first"<<std::endl;
@@ -516,8 +502,8 @@ class PageTableWalker: public BasePageTableWalker
 				evict_and_fetch(req, dram_block,entry ,evict);
 				//std::cout<<"migrate from:"<<std::hex<<req.lineAddr<<" to:"<<std::hex<<dram_addr<<std::endl;
 				//TLB shootdown2: related to installed pages
-				/*Address vpage_installed = entry->v_page_no;//2
-				tlb_shootdown_hscc(req, vpage_installed,(dram_addr>>zinfo->page_shift), hscc_tlb_shootdown, true);//2 */
+				Address vpage_installed = entry->v_page_no;
+				tlb_shootdown_hscc(req, vpage_installed,(dram_addr>>zinfo->page_shift), hscc_tlb_shootdown, true); 
 		 }
 	 }
 
