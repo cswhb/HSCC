@@ -38,11 +38,9 @@
 #include "g_std/g_vector.h"
 #include "galloc.h"
 #include "locks.h"
-#include ""
 #include "common/global_const.h"
 #include <iostream>
 /** TYPES **/
-#include"tlb/tlb_entry.h"//cswhb added
 /* Addresses are plain 64-bit uints. This should be kept compatible with PIN addrints */
 
 /* Types of Access. An Access is a request that proceeds from lower to upper
@@ -197,11 +195,11 @@ class BaseDRAMBufferManager: public GlobAlloc
 {
 	public:
 		virtual ~BaseDRAMBufferManager(){};
-		virtual DRAMBufferBlock* allocate_one_page(uint64_t page_shift, uint32_t proc = INVALID_PROC) { return NULL; }
+		virtual DRAMBufferBlock* allocate_one_page(void*p,MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict,uint64_t page_shift, uint32_t proc = INVALID_PROC) { return NULL; }
 		virtual double get_memory_usage(){ return 0.0;};
 		virtual void SetBlockDirty( Address block_id){};
 		virtual void convert_to_dirty( unsigned process_id , Address block_id){}
-		virtual void evict( BasePageTableWalker*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,DRAMEVICTSTYLE evict_policy){}
+		virtual void evict( void*p,MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict,DRAMEVICTSTYLE evict_policy){}
 		virtual bool should_reclaim(){ return false; }
 		virtual bool should_cherish(){ return false;}
 		virtual bool should_more_cherish(){ return false;}

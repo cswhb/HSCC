@@ -165,7 +165,7 @@ class PageTableWalker: public BasePageTableWalker
 			//allocate dram buffer block
 			uint64_t order=0;
 			unsigned index=0;
-			DRAMBufferBlock* dram_block = allocate_page(this,req, dram_block,entry, coreId, evict,entry->TLBpage_shift);
+			DRAMBufferBlock* dram_block = allocate_page((void*)this,req, dram_block,(void*)entry, coreId, evict,entry->TLBpage_shift);
 			if( dram_block)
 			{
 				//*clflush nvm pages from on-chip caches
@@ -281,7 +281,7 @@ class PageTableWalker: public BasePageTableWalker
 			return latency;
 		}
 
-		DRAMBufferBlock* allocate_page(PageTableWalker<ExtendTlbEntry>*p1, MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,uint64_t shift)
+		DRAMBufferBlock* allocate_page(void*p1, MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict,uint64_t shift)
 		{
 			if( zinfo->dram_manager->should_reclaim() )
 			{
@@ -341,7 +341,7 @@ class PageTableWalker: public BasePageTableWalker
 			if( dram_block->is_occupied())//2
 			{
 				//std::cout<<"evict:"<<dram_addr<<std::endl;
-				if(((dram_block->block_id>>dram_block->block_shift-12)<<dram_block->block_shift-12)==dram_block->block_id){
+				if((((dram_block->block_id)>>(dram_block->block_shift-12))<<((dram_block->block_shift)-12))==dram_block->block_id){
 				if( zinfo->enable_shared_memory)
 				{
 					overhead = remap_page_table( dram_addr>>(zinfo->page_shift),origin_ppn, true, false);
@@ -487,7 +487,7 @@ class PageTableWalker: public BasePageTableWalker
 			}
 		}
 
-
+public:
 		void evict_DRAM_page(MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict)
 		{
 			if( dram_block)
@@ -521,7 +521,7 @@ class PageTableWalker: public BasePageTableWalker
 		 }
 	 }
 
-public:
+
 		PagingStyle mode;
 		g_string pg_walker_name;
 	    BasePaging* paging;

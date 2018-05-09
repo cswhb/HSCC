@@ -150,9 +150,34 @@ MemoryNode::MemoryNode( unsigned id , Address start_addr=0):
 	setup_per_zone_wmarks();
 }
 
+MemoryNode::MemoryNode( unsigned id , uint64_t size,Address start_addr=0):
+	node_id(id) , node_start_pfn( start_addr >> zinfo->page_shift),lowmem_kbytes(0),min_free_kbytes(0)
+{
+	debug_printf("create memory node");
+	memset(zone_lowest_possible , 0 , sizeof(zone_lowest_possible));
+	memset( zone_highest_possible , 0 , sizeof(zone_highest_possible));
+
+	zone_lowest_possible[0]= node_start_pfn;
+	zone_highest_possible[0]= zinfo->max_zone_pfns[Zone_DMA];
+	zone_lowest_possible[1] = 0;
+	zone_highest_possible[1] =0;
+	zone_lowest_possible[2] = 0;
+	zone_highest_possible[2] =1<<size;
+	zone_lowest_possible[3] = 1<<size;
+	zone_highest_possible[3] = 1<<size;
+	//calculate total page number of a node
+	node_page_num = calculate_total_pages();
+	present_pages = node_page_num;
+	//allocate node_mem_map
+	debug_printf("memory node: allocate node mem map , page num: %lld",node_page_num);
+	//allocate_node_mem_map(0,node_page_num);
+	init_zones();
+	//init water value for per zone
+	setup_per_zone_wmarks();
+}
 //cswhb added
 //set dram zone 
-MemoryNode::reset_zone(uint64_t size){
+bool MemoryNode::reset_zone(uint64_t size){
 	zone_highest_possible[2]=size;
 	zone_lowest_possible[MAX_NR_ZONES-1]=size;
 	zone_highest_possible[MAX_NR_ZONES-1]=size;
@@ -163,6 +188,7 @@ MemoryNode::reset_zone(uint64_t size){
 	debug_printf("memory node:redo  allocate node mem map , page num: %lld",node_page_num);
 	init_zones();
 	setup_per_zone_wmarks();
+	return true;
 }
 //you are very important for delete some allocated objects
 //such as zones

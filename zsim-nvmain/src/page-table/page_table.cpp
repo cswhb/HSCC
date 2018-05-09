@@ -885,13 +885,13 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		}
 		if(!pbuffer){
 			(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
-			if(((((Page*)pg_ptr)->pageNo>>(((Page*)pg_ptr)->page_shift-12))<<(((Page*)pg_ptr)->page_shift-12))!=(Page*)pg_ptr)->pageNo)
+			if(((((Page*)pg_ptr)->pageNo>>(((Page*)pg_ptr)->page_shift-12))<<(((Page*)pg_ptr)->page_shift-12))!=((Page*)pg_ptr)->pageNo)
 			return latency;
 		}
 		
 		else{
 			(*table)[pt]->PDTEpage_shift=((DRAMBufferBlock*)pg_ptr)->block_shift; 
-			if(((((DRAMBufferBlock*)pg_ptr)->block_id>>(((DRAMBufferBlock*)pg_ptr)->block_shift-12))<<(((DRAMBufferBlock*)pg_ptr)->block_shift-12))!=(DRAMBufferBlock*)pg_ptr)->block_id)
+			if(((((DRAMBufferBlock*)pg_ptr)->block_id>>(((DRAMBufferBlock*)pg_ptr)->block_shift-12))<<(((DRAMBufferBlock*)pg_ptr)->block_shift-12))!=((DRAMBufferBlock*)pg_ptr)->block_id)
 			return latency;
 		}
 		if( !is_valid(table, pt) )	

@@ -60,10 +60,10 @@ class ProcessTreeNode : public GlobAlloc {
             : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), started(false), inFastForward(_inFastForward),
               inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) 
 			  {
-			  	procpage_shift=zinfo->page_shift;
+			  	procpage_shift=12;
 			  	procmem_size=0;
 			  	procmax_shift=procpage_shift;
-			  	procpage_size=zinfo->page_size;
+			  	procpage_size=1<<12;
 			  	procmax_size = procpage_size;
 			  }
 

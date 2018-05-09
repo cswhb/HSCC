@@ -11,6 +11,9 @@
 BuddyAllocator::BuddyAllocator(MemoryNode* node)
 {
 	mode = zinfo->paging_mode;
+	if(node->zone_highest_possible[2]==(1<<18))
+	total_memsize=1<<30;
+	else 
 	total_memsize = zinfo->memory_size;
 	assert(total_memsize>0);
 	free_page_num = total_memsize>>(zinfo->page_shift);

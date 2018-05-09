@@ -19,12 +19,12 @@ class FairAllocator: public BaseDRAMBufferManager
 		FairAllocator( unsigned proccess_num , 
 					   Address memory_size);
 		
-		unsigned Release( unsigned process_id , unsigned evict_size );
-		DRAMBufferBlock* allocate_one_page( PageTableWalker<ExtendTlbEntry>*p,MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id );
+		unsigned Release( void*p,MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict,unsigned process_id, unsigned evict_size);
+		DRAMBufferBlock* allocate_one_page( void*p,MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id );
 		void convert_to_dirty( unsigned process_id , Address block_id);  
 		double get_memory_usage();
 		bool should_reclaim();
-		void evict( DRAMEVICTSTYLE policy);
+		void evict(void*p,MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict,DRAMEVICTSTYLE policy);
 		bool should_cherish();
 		bool should_more_cherish();
 		virtual DRAMBufferBlock* get_page_ptr( uint64_t entry_id );
@@ -32,7 +32,7 @@ class FairAllocator: public BaseDRAMBufferManager
 		MemoryNode* DRAM_mem_node;//cswhb added
 	private:
 		void fairness_evict();
-		void equal_evict();
+		void equal_evict(void*p,MemReq& req, DRAMBufferBlock* dram_block,void* entry, uint32_t core_id, bool &evict);
 	private:
 		unsigned process_count;
 		Address memory_capacity;
