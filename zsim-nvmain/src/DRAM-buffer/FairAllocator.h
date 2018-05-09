@@ -11,10 +11,7 @@
 #include "g_std/g_unordered_set.h"
 #include "memory_hierarchy.h"
 #include "DRAM-buffer/DRAM_buffer_block.h"
-<<<<<<< HEAD
 #include "tlb/page_table_walker.h"//cswhb added
-=======
->>>>>>> parent of c6a8249... before change allocate_one_page
 #include "MMU/memory_management.h"  //cswhb added
 class FairAllocator: public BaseDRAMBufferManager 
 {
@@ -23,11 +20,7 @@ class FairAllocator: public BaseDRAMBufferManager
 					   Address memory_size);
 		
 		unsigned Release( unsigned process_id , unsigned evict_size );
-<<<<<<< HEAD
-		DRAMBufferBlock* allocate_one_page( PageTableWalker<ExtendTlbEntry>*p,MemReq& req, DRAMBufferBlock* dram_block,BaseTlbEntry* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id );
-=======
-		DRAMBufferBlock* allocate_one_page( unsigned process_id );
->>>>>>> parent of c6a8249... before change allocate_one_page
+		DRAMBufferBlock* allocate_one_page( PageTableWalker<ExtendTlbEntry>*p,MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict,uint64_t page_shift,unsigned process_id );
 		void convert_to_dirty( unsigned process_id , Address block_id);  
 		double get_memory_usage();
 		bool should_reclaim();
