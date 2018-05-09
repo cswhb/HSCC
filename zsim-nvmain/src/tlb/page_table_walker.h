@@ -285,7 +285,7 @@ class PageTableWalker: public BasePageTableWalker
 		{
 			if( zinfo->dram_manager->should_reclaim() )
 			{
-				zinfo->dram_manager->evict( zinfo->dram_evict_policy);
+				zinfo->dram_manager->evict( p1,req,dram_block,entry,core_id,evict,zinfo->dram_evict_policy);
 			}
 			//std::cout<<"allocate page table"<<std::endl;
 			return (zinfo->dram_manager)->allocate_one_page( p1,req,dram_block,entry,core_id,evict,shift,procIdx);
