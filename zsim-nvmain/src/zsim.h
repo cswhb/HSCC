@@ -266,6 +266,8 @@ struct GlobSimInfo {
 	uint64_t pagenum_12;
     uint64_t pagenum_17;
     uint64_t pagenum_22;
+    uint64_t dram_alloc_times;
+	uint64_t dram_alloc_failed_times; 
 };
 
 

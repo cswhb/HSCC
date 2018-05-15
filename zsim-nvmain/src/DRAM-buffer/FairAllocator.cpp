@@ -44,7 +44,8 @@ FairAllocator::FairAllocator( unsigned process_num ,
     DRAM_mem_node = new (mem_node) MemoryNode(3,18,0);
     BuddyAllocator* buddy = gm_memalign<BuddyAllocator>(CACHE_LINE_BYTES , 1);
 	DRAM_buddy_allocator = new (buddy) BuddyAllocator(DRAM_mem_node);
-
+    zinfo->dram_alloc_times=0;
+	zinfo->dram_alloc_failed_times=0;  
 	futex_init(&pool_lock);
 }
 
@@ -182,7 +183,9 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( void*p,MemReq& req, DRAMBuffe
 	Address proc_busy_size;
 	//cswhb modified
 	Page*page=DRAM_buddy_allocator->allocate_pages(0,0,page_shift-12);
+	zinfo->dram_alloc_times++;
 	while(!page){
+		zinfo->dram_alloc_failed_times++;
 		for( uint32_t i=0; i< process_count; i++)
 	    {
 		    proc_busy_size = clean_pools[i].size()+dirty_pools[i].size();

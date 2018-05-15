@@ -120,12 +120,14 @@ class ProcessTreeNode : public GlobAlloc {
         	index[17]=2;
         	index[22]=3;
         	procmem_size+=1<<shift;
-        	if(procpage_shift>12&&procmem_size <=(1<<rank[index[procpage_shift]-1])*(procpage_shift==17?128:64)/2 ){
+        	//if(procpage_shift>12&&procmem_size <=(1<<rank[index[procpage_shift]-1])*(procpage_shift==17?128:64)/2 ){
+        	if(procpage_shift>12&&procmem_size <=(1<<rank[index[procpage_shift]-1])){
         		//delete these will make procpage_size never decrease; 
         		procpage_shift=rank[index[procpage_shift]-1];
         		procpage_size=1<<procpage_shift;
 			}
-        	else if(procmem_size>=procpage_size*(procpage_shift==17?64:128) && procpage_shift<22){
+        	//else if(procmem_size>=procpage_size*(procpage_shift==17?64:128) && procpage_shift<22){
+        	else if(procmem_size>=(1<<rank[index[procpage_shift]+1]) && procpage_shift<22){
         		procpage_shift=rank[index[procpage_shift]+1];;
         		procpage_size=1<<procpage_shift;
         		if(procmax_shift<procpage_shift){
