@@ -885,21 +885,59 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		}
 		if(!pbuffer){
 			(*table)[pt]->PDTEpage_shift=((Page*)pg_ptr)->page_shift; 
-			if(((((Page*)pg_ptr)->pageNo>>(((Page*)pg_ptr)->page_shift-12))<<(((Page*)pg_ptr)->page_shift-12))!=((Page*)pg_ptr)->pageNo)
+			if(((((Page*)pg_ptr)->pageNo>>(((Page*)pg_ptr)->page_shift-(zinfo->page_shift)))<<(((Page*)pg_ptr)->page_shift-(zinfo->page_shift)))!=((Page*)pg_ptr)->pageNo)
 			return latency;
 		}
 		
 		else{
 			(*table)[pt]->PDTEpage_shift=((DRAMBufferBlock*)pg_ptr)->block_shift; 
-			if(((((DRAMBufferBlock*)pg_ptr)->block_id>>(((DRAMBufferBlock*)pg_ptr)->block_shift-12))<<(((DRAMBufferBlock*)pg_ptr)->block_shift-12))!=((DRAMBufferBlock*)pg_ptr)->block_id)
+			if(((((DRAMBufferBlock*)pg_ptr)->block_id>>(((DRAMBufferBlock*)pg_ptr)->block_shift-(zinfo->page_shift)))<<(((DRAMBufferBlock*)pg_ptr)->block_shift-(zinfo->page_shift)))!=((DRAMBufferBlock*)pg_ptr)->block_id)
 			return latency;
 		}
 		if( !is_valid(table, pt) )	
 			mapped_entry = (*table)[pt];
 		validate_entry(table , pt , pg_ptr, pbuffer);
 		
-		
-		if((*table)[pt]->PDTEpage_shift==12){
+		if((*table)[pt]->PDTEpage_shift<=20){
+			for(int i=0;i<zinfo->pagesize_num;i++){
+				if(zinfo->ps_array[i]>((*table)[pt]->PDTEpage_shift)){
+					if(zinfo->ps_array[i]<=20){
+						mask=~((unsigned)(-1)<<(zinfo->ps_array[i]-zinfo->page_shift));
+						new_pt=pt&(~mask);
+						(*table)[new_pt]->hugepage_enable+=1<<((*table)[pt]->PDTEpage_shift-zinfo->page_shift);
+					}
+					else{
+						mask=~((unsigned)(-1)<<(zinfo->ps_array[i]-21));
+						new_pd=pd&(~mask);
+						(*table2)[new_pd]->hugepage_enable+=1<<((*table)[pt]->PDTEpage_shift-zinfo->page_shift2);
+					}
+				}
+			}
+			mask=~((unsigned)(-1)<<((*table)[pt]->PDTEpage_shift-zinfo->page_shift));
+			new_pt=pt&(~mask);
+			for(unsigned i =new_pt;i<=(pt|mask);i++){
+				*((*table)[i])=*((*table)[pt]);
+			}
+		}
+		else{
+			for(int i=0;i<zinfo->pagesize_num;i++){
+				if(zinfo->ps_array[i]>((*table)[pt]->PDTEpage_shift)){
+					mask=~((unsigned)(-1)<<(zinfo->ps_array[i]-21));
+					new_pd=pd&(~mask);
+					(*table2)[new_pd]->hugepage_enable+=1<<((*table)[pt]->PDTEpage_shift-zinfo->page_shift2);
+				}
+			}
+			for(unsigned i =0;i<=512;i++){
+				*((*table)[i])=*((*table)[pt]);
+			}
+			mask=~((unsigned)(-1)<<((*table)[pt]->PDTEpage_shift-21));
+			new_pd=pd&(~mask);
+			for(unsigned i =new_pd;i<=(pd|mask);i++){
+				*((*table2)[i])=*((*table2)[pd]);
+			}
+		}
+		(*table)[pt]->used[pd]=1;
+		/*if((*table)[pt]->PDTEpage_shift==12){
 			mask=0x1f;
 			new_pt=pt&(~mask);
 			(*table)[new_pt]->hugepage_enable+=4*1024;
@@ -934,7 +972,7 @@ int LongModePaging::map_page_table( Address addr, void* pg_ptr , bool pbuffer, B
 		else {
 			debug_printf("error map page_shift");
 			return false;
-		}
+		}*/
 		/*
 		if( pbuffer)
 		{
@@ -1040,7 +1078,20 @@ bool LongModePaging::unmap_page_table( Address addr)
 			debug_printf("didn't find entry indexed with %ld !",addr);
 			return false;
 		}
-		if((table->entry_array[pt_id])->PDTEpage_shift==22){
+		if((table->entry_array[pt_id])->PDTEpage_shift<=20){
+			
+		}
+		else{
+			if(((*table)[pt_id])->used[pd_id]==1){
+				((*table)[pt_id])->used[pd_id]=0;
+				for(int i=0;i<zinfo->pagesize_num;i++){
+					if(zinfo->ps_entry[i]>((table->entry_array[pt_id])->PDTEpage_shift)){
+						((*table2)[pd_id&(~mask)])->usedup-=1<<(zinfo->page_shift);
+					}
+				}
+			}
+		}
+		/*if((table->entry_array[pt_id])->PDTEpage_shift==22){
 			if((*table)[pt_id]->used[pd_id&0x1]==0){
 				info("unmap error");
 			}
@@ -1081,7 +1132,7 @@ bool LongModePaging::unmap_page_table( Address addr)
 		else {
 			debug_printf("unmap error !");
 			return false;
-		}
+		}*/
 	}
 	else if( mode == LongMode_Middle )
 	{

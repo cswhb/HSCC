@@ -451,6 +451,12 @@ static void InitSystem(Config& config) {
 	zinfo->page_size = 1<<(zinfo->page_shift);
 	zinfo->block_size = zinfo->page_size;
 	zinfo->block_shift = zinfo->page_shift;
+	
+	//cswhb added
+	uint64_t psarray[32]={4,17,22};
+	zinfo->pagesize_num=3;
+	for(int i=0;i<zinfo->pagesize_num;i++)
+	    zinfo->ps_array[i]=psarray[i];
 
     unordered_map<string, string> parentMap; //child -> parent
     unordered_map<string, vector<string>> childMap; //parent -> children (a parent may have multiple children, they are ordered by appearance in the file)

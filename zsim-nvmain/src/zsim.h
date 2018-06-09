@@ -268,6 +268,8 @@ struct GlobSimInfo {
     uint64_t pagenum_22;
     uint64_t dram_alloc_times;
 	uint64_t dram_alloc_failed_times; 
+	uint64_t pagesize_num;
+	uint64_t ps_array[32];//all page_shift cswhb added
 };
 
 
