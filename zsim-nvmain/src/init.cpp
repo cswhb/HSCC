@@ -1283,6 +1283,8 @@ void SimInit(const char* configFile, const char* outputDir, uint32_t shmid) {
 
     zinfo->contentionSim->postInit();
 
+    zinfo->DRAMtimes=0;
+    zinfo->NVMtimes=0;//cswhb
     info("Initialization complete");
     debug_printf("Initialization complete");
     //Causes every other process to wake up

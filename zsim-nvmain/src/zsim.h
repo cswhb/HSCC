@@ -174,6 +174,8 @@ struct GlobSimInfo {
     StatsBackend* eventualStatsBackend;
     StatsBackend* compactStatsBackend;
     ProcessStats* processStats;
+    uint64_t DRAMtimes;//alloc DRAM pages  cswhb
+    uint64_t NVMtimes;//alloc NVM pages  cswhb
 
     TimeBreakdownStat* profSimTime;
     VectorCounter* profHeartbeats; //global b/c number of processes cannot be inferred at init time; we just size to max

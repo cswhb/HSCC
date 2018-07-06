@@ -42,6 +42,8 @@ class ProcessTreeNode : public GlobAlloc {
         const uint32_t groupIdx;	//gid
         volatile uint32_t curChildren;
         volatile uint64_t heartbeats;
+        volatile uint64_t modeSign; //if modeSign is 0 => HSCC else HSCC_MM  cswhb
+        volatile uint64_t placeSign;//if placeSign is 0 =>DRAM else PCM  cswhb
         bool started;
         volatile bool inFastForward;
         volatile bool inPause;
@@ -57,13 +59,21 @@ class ProcessTreeNode : public GlobAlloc {
     public:
         ProcessTreeNode(uint32_t _procIdx, uint32_t _groupIdx, bool _inFastForward, bool _inPause, bool _syncedFastForward,
                         uint32_t _clockDomain, uint32_t _portDomain, uint64_t _dumpHeartbeats, bool _dumpsResetHeartbeats, uint32_t _restarts,const g_vector<bool>& _mask, const g_vector<uint64_t>& _ffiPoints, const g_string& _syscallBlacklistRegex, const char*_patchRoot)
-            : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), started(false), inFastForward(_inFastForward),
+            : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), modeSign(1), placeSign(0), started(false), inFastForward(_inFastForward),
               inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) {}
 
         void addChild(ProcessTreeNode* child) {
             children.push_back(child);
         }
 
+        void setmodeSign(const uint64_t newMode){
+        	modeSign=newMode;//set 
+		}
+
+        void setplaceSign(void){
+            placeSign=^1;
+        }
+		
         ProcessTreeNode* getNextChild() {
             if (curChildren == children.size()) { //allocate a new child
                 uint32_t childProcIdx = __sync_fetch_and_add(&zinfo->numProcs, 1);

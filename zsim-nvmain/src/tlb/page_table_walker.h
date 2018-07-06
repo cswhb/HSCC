@@ -112,45 +112,54 @@ class PageTableWalker: public BasePageTableWalker
 			info("%s clflush overhead caused by caching:%llu",getName(), clflush_overhead);
 			info("%s clflush overhead caused extra write:%llu",getName(), extra_write);
 		}
-		
+		void do_share_mem(MemReq& req,void *page,bool isDRAM){
+			if( zinfo->enable_shared_memory)
+			{
+				if( !map_shared_region(req, page, isDRAM) )
+				{
+					//std::cout<<"map "<< pg_walker_name<<":"<<req.lineAddr<<"->"<<page->pageNo<<std::endl;
+					Address overhead = paging->map_page_table( req.lineAddr,(void*)page，isDRAM);
+					pcm_map_overhead += overhead;
+					req.cycle += overhead;
+				}
+			}
+			else
+			{
+				Address overhead = paging->map_page_table( req.lineAddr,(void*)page, isDRAM);
+				pcm_map_overhead += overhead;
+				req.cycle += overhead;
+			}
+		}
 		Address do_page_fault(MemReq& req, PAGE_FAULT fault_type)
 		{
 		    //allocate one page from Zone_Normal area
 		    debug_printf("page falut, allocate free page through buddy allocator");
-		    Page* page = NULL;
-			if( zinfo->buddy_allocator)
+		    //Page* page = NULL;
+		    void* page=NULL;
+		    bool evict=false;
+		    bool isDRAM=procArray[procIdx]->modeSign&&procArray[procIdx]->placeSign;
+		    if(isDRAM){//page places in DRAM if true,else PCM
+		    	return do_dram_page_fault(req,0,req.srcId,DRAM_BUFFER_FAULT,NULL,false,evict,isDRAM); //cswhb
+		    	zinfo->DRAMpages++;
+		    }
+		    else if( zinfo->buddy_allocator){
+		    	page = (void*)zinfo->buddy_allocator->allocate_pages(0);
+		    	zinfo->NVMpages++;
+		    }
+			if(page)
 			{
-				page = zinfo->buddy_allocator->allocate_pages(0);
-				if(page)
-				{
-					//TLB shootdown
-					Address vpn = req.lineAddr>>(zinfo->page_shift);
-					tlb_shootdown(req, vpn, tlb_shootdown_overhead );
-					if( zinfo->enable_shared_memory)
-					{
-						if( !map_shared_region(req, page) )
-						{
-							//std::cout<<"map "<< pg_walker_name<<":"<<req.lineAddr<<"->"<<page->pageNo<<std::endl;
-							Address overhead = paging->map_page_table( req.lineAddr,(void*)page);
-							pcm_map_overhead += overhead;
-							req.cycle += overhead;
-						}
-					}
-					else
-					{
-						Address overhead = paging->map_page_table( req.lineAddr,(void*)page);
-						pcm_map_overhead += overhead;
-						req.cycle += overhead;
-					}
-					allocated_page++;
-					return page->pageNo;
-				}
+				//TLB shootdown
+				Address vpn = req.lineAddr>>(zinfo->page_shift);
+				tlb_shootdown(req, vpn, tlb_shootdown_overhead );
+				do_share_mem(req, page, isDRAM);
+				allocated_page++;
+				return page->pageNo;
 			}
 			//update page table
 			return (req.lineAddr>>zinfo->page_shift);
 		}
 		
-		Address do_dram_page_fault(MemReq& req, Address vpn ,uint32_t coreId, PAGE_FAULT fault_type , T* entry , bool is_itlb , bool &evict)
+		Address do_dram_page_fault(MemReq& req, Address vpn ,uint32_t coreId, PAGE_FAULT fault_type , T* entry , bool is_itlb , bool &evict , bool isDRAM=false)
 		{
 			debug_printf("fetch pcm page %d to DRAM",(req.lineAddr>>zinfo->page_shift));
 			
@@ -161,7 +170,7 @@ class PageTableWalker: public BasePageTableWalker
 				//*clflush nvm pages from on-chip caches
 				bool req_write_back = true;
 				uint64_t write_backs = 0;
-				uint64_t cycle = clflush(req.lineAddr, &req_write_back, req.cycle, coreId, write_backs);
+				uint64_t cycle = isDRAM?req.cycle:clflush(req.lineAddr, &req_write_back, req.cycle, coreId, write_backs);
 				if( write_backs)
 					extra_write += write_backs;
 				clflush_overhead += (cycle - req.cycle);
@@ -170,15 +179,15 @@ class PageTableWalker: public BasePageTableWalker
 				//*2.evict dirty DRAM page
 				//*3.tlb shootdown
 				//*4.map page table
-				evict_DRAM_page( req, dram_block,entry, coreId, evict);
+				evict_DRAM_page( req, dram_block,entry, coreId, evict, isDRAM);
 				
-				 return block_id_to_addr( dram_block->block_id);
+				return block_id_to_addr( dram_block->block_id);
 			}
 			return INVALID_PAGE_ADDR;
 		}
 
 	private:
-		bool inline map_shared_region( MemReq& req , void* page)
+		bool inline map_shared_region( MemReq& req , void* page , bool isDRAM=false)//cswhb
 		{
 			Address vaddr = req.lineAddr;
 			//std::cout<<"find out shared region"<<std::endl;
@@ -195,7 +204,7 @@ class PageTableWalker: public BasePageTableWalker
 				if( find_shared_vm(vaddr,
 						zinfo->shared_region[procIdx][mmap_cached]) )
 				{
-					Address overhead = map_all_shared_memory( vaddr, (void*)page);
+					Address overhead = map_all_shared_memory( vaddr, (void*)page , isDRAM);
 					req.cycle += overhead;
 					pcm_map_overhead += overhead;
 					return true;
@@ -209,7 +218,7 @@ class PageTableWalker: public BasePageTableWalker
 						if( find_shared_vm(vaddr, 
 							zinfo->shared_region[procIdx][mmap_cached]))
 						{
-							Address overhead = map_all_shared_memory(vaddr, (void*)page);
+							Address overhead = map_all_shared_memory(vaddr, (void*)page , isDRAM);
 							req.cycle += overhead;
 							pcm_map_overhead += overhead;
 							return true;
@@ -226,7 +235,7 @@ class PageTableWalker: public BasePageTableWalker
 						if( find_shared_vm(vaddr, 
 							zinfo->shared_region[procIdx][mmap_cached]))
 						{
-							Address overhead = map_all_shared_memory(vaddr, (void*)page);
+							Address overhead = map_all_shared_memory(vaddr, (void*)page , isDRAM);
 							req.cycle += overhead;
 							pcm_map_overhead += overhead;
 							return true;
@@ -246,7 +255,7 @@ class PageTableWalker: public BasePageTableWalker
 			return false;
 		}
 
-		int inline map_all_shared_memory( Address va, void* page)
+		int inline map_all_shared_memory( Address va, void* page, bool isDRAM)//cswhb
 		{
 			int latency = 0;
 			//std::cout<<"map all shared memory:"<<va<<std::endl;
@@ -255,7 +264,7 @@ class PageTableWalker: public BasePageTableWalker
 				assert(zinfo->paging_array[i]);
 				//std::cout<<"map "<<i<<std::endl;
 				//std::cout<<"map "<<i<<" "<<va<<"->"<<(((Page*)page)->pageNo)<<std::endl;
-				latency += zinfo->paging_array[i]->map_page_table(va,page);
+				latency += zinfo->paging_array[i]->map_page_table(va,page,isDRAM);
 			}
 			return latency;
 		}
@@ -298,7 +307,7 @@ class PageTableWalker: public BasePageTableWalker
 			}
 		}
 
-		inline void evict_and_fetch( MemReq& req, DRAMBufferBlock* dram_block,T* entry, bool& evict)
+		inline void evict_and_fetch( MemReq& req, DRAMBufferBlock* dram_block,T* entry, bool& evict, bool isDRAM = false)
 		{
 			Address origin_ppn = dram_block->get_src_addr();
 			Address dram_addr = block_id_to_addr( dram_block->block_id);
@@ -312,42 +321,57 @@ class PageTableWalker: public BasePageTableWalker
 				store_page( req, dram_addr, dst_addr, true, NVM::FETCH);
 			}
 			if( dram_block->is_occupied())
-				total_evict++;
-			//call memory controller interface to cache page
-			store_page( req, req.lineAddr, dram_addr, false, NVM::READ);
-			Address overhead = 0;			
-			//invalidate dram
-			if( dram_block->is_occupied())
-			{
-				//std::cout<<"evict:"<<dram_addr<<std::endl;
-				if( zinfo->enable_shared_memory)
-				{
-					overhead = remap_page_table( dram_addr>>(zinfo->page_shift),origin_ppn, true, false);
-				}
-				else
-				{
-					Address vpn = dram_block->get_vaddr();
-					Page* page_ptr = zinfo->memory_node->get_page_ptr(origin_ppn); 
-					overhead = paging->map_page_table((vpn<<zinfo->page_shift),(void*)page_ptr,false);
-				}
-				req.cycle += overhead;
-				hscc_map_overhead += overhead;
-				dram_block->invalidate();
+     		{
+     			total_evict++;
+     			//std::cout<<"evict:"<<dram_addr<<std::endl;
+     			if( zinfo->enable_shared_memory)
+     			{
+     				overhead = remap_page_table( dram_addr>>(zinfo->page_shift),origin_ppn, true, false);
+     			}
+     			else
+     			{
+     				Address vpn = dram_block->get_vaddr();
+     				Page* page_ptr = zinfo->memory_node->get_page_ptr(origin_ppn); 
+     				overhead = paging->map_page_table((vpn<<zinfo->page_shift),(void*)page_ptr,false);
+     			}
+     			req.cycle += overhead;
+     			hscc_map_overhead += overhead;
+     			dram_block->invalidate();
+     		}
+			if(isDRAM){
+				Address vpn = req.lineAddr>>(zinfo->page_shift);
+				tlb_shootdown(req, vpn, tlb_shootdown_overhead );
+				do_share_mem(req, dram_block, isDRAM);
+				//allocated_page++;
+				dram_block->isDRAM = isDRAM;
 			}
-			dram_block->validate(req.lineAddr>>(zinfo->block_shift));
-			dram_block->set_src_addr( entry->p_page_no );
-			dram_block->set_vaddr( entry->v_page_no);
-			debug_printf("after remap , vpn:%llx , ppn:%llx",entry->v_page_no , entry->p_page_no);
-			//update extended page table
-			if( zinfo->enable_shared_memory )
-			{
-				//std::cout<<"remap page table "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
-				overhead = remap_page_table( entry->p_page_no,dram_addr>>(zinfo->page_shift), false , true);
-			}
-			else
-			{
-				//std::cout<<"remap page table "<<entry->v_page_no<<": "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
-				overhead= paging->map_page_table(( (entry->v_page_no)<<zinfo->page_shift),(void*)dram_block,true);
+			else{
+				store_page( req, req.lineAddr, dram_addr, false, NVM::READ);
+     			Address overhead = 0;			
+     			//invalidate dram
+     			dram_block->validate(req.lineAddr>>(zinfo->block_shift));
+     			dram_block->set_src_addr( entry->p_page_no );
+     			dram_block->set_vaddr( entry->v_page_no);
+     			debug_printf("after remap , vpn:%llx , ppn:%llx",entry->v_page_no , entry->p_page_no);
+     			//update extended page table
+     			if( zinfo->enable_shared_memory )
+     			{
+     				//std::cout<<"remap page table "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
+     				overhead = remap_page_table( entry->p_page_no,dram_addr>>(zinfo->page_shift), false , true);
+     			}
+     			else
+     			{
+     				//std::cout<<"remap page table "<<entry->v_page_no<<": "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
+     				overhead= paging->map_page_table(( (entry->v_page_no)<<zinfo->page_shift),(void*)dram_block,true);
+     			}
+     			if(zinfo->procArray[procIdx]->isDRAM)//free nvm block when process->isDRAM=1  cswhb
+     			{
+     				Zone* zone = gfp_zone( 0 );
+     				if(!zone)info("zone error");//debug
+     				zinfo->buddy_allocator->free_one_page(zone, entry->p_page_no, 0);//not use cpu hot-cold page   cswhb
+     				allocated_page--;
+     				dram_block->isDRAM = true;
+     			}
 			}
 			
 			req.cycle += overhead;
@@ -430,7 +454,7 @@ class PageTableWalker: public BasePageTableWalker
 		}
 
 
-		void evict_DRAM_page(MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict)
+		void evict_DRAM_page(MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict, bool isDRAM = flase)
 		{
 			if( dram_block)
 			{
@@ -455,7 +479,13 @@ class PageTableWalker: public BasePageTableWalker
 					tlb_shootdown_hscc(req,vpn,dram_block->get_src_addr(), hscc_tlb_shootdown, false);
 				}
 				//if victim DRAM block is dirty, evict to main memory
-				evict_and_fetch(req, dram_block,entry ,evict);
+				if(dram_block->isDRAM&&dram_block->is_occupied()){
+					Page* page = zinfo->buddy_allocator->allocate_pages(0); 
+					dram_block->set_src_addr( page->pageNo );
+					dram_block->set_dirty();
+				}
+				evict_and_fetch(req, dram_block,entry ,evict, isDRAM);
+				//dram_block->isDRAM = isDRAM;
 				//std::cout<<"migrate from:"<<std::hex<<req.lineAddr<<" to:"<<std::hex<<dram_addr<<std::endl;
 				//TLB shootdown2: related to installed pages
 				Address vpage_installed = entry->v_page_no;

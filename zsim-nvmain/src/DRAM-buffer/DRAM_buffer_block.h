@@ -11,10 +11,11 @@ struct DRAMBufferBlock: public GlobAlloc
 	Address original_addr;
 	Address vaddr;
 	DRAMBufferBlock* next;
+	bool isDRAM;
 	DRAMBufferBlock( Address id):block_id(id)
 	{}
 
-	DRAMBufferBlock(Address id , unsigned max_count):flag(0),hotness(max_count),max_queue(max_count),block_id(id),next(NULL)
+	DRAMBufferBlock(Address id , unsigned max_count):flag(0),hotness(max_count),max_queue(max_count),block_id(id),next(NULL),isDRAM(false)
 	{}
 	bool is_occupied()
 	{	return (flag & USED);	}

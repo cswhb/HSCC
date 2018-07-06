@@ -139,6 +139,7 @@ class HotMonitorTlb: public BaseTlb
 			info("pcm tlb hit part(+dram tlb hit part=total hit part):%.5f",pcm_tlb_hit_part);
 			info("dram tlb hit rate(dram TLB hit to all dram TLB access):%.5f",dram_tlb_hit_rate);
 			info("pcm tlb hit rate(PCM TLB hit to all PCM TLB access):%.5f",pcm_tlb_hit_rate);
+			info("NVM pages:%lu,DRAM pages:%lu", zinfo->NVMtimes,zinfo->DRAMtimes);
 			return ordinary_tlb->calculate_stats();
 		}
 		
