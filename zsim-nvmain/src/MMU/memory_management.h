@@ -43,6 +43,9 @@ class BuddyAllocator
 		
 		inline uint64_t get_free_memory_size();
 		static void InitMemoryNode( MemoryNode* node);
+		Zone* get_zone(unsigned int flags){
+			return gfp_zone(flags);
+		}
 	private:
 		uint64_t find_buddy_index(uint64_t page_no , unsigned order );
 		bool page_is_buddy( uint64_t page_id , uint64_t buddy_id , unsigned order);
@@ -51,7 +54,7 @@ class BuddyAllocator
 		void expand(MemoryNode* mem_node,Zone* zone , uint64_t page_id , unsigned low_order , unsigned high_order );
 
 		void free_hot_cold_page(Page* page , unsigned cpu_id , bool cold);
-		inline Zone* gfp_zone( unsigned int flags);
+	    Zone* gfp_zone( unsigned int flags);
 	private:
 		uint64_t total_memsize;
 		PagingStyle mode;

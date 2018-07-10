@@ -59,7 +59,7 @@ class ProcessTreeNode : public GlobAlloc {
     public:
         ProcessTreeNode(uint32_t _procIdx, uint32_t _groupIdx, bool _inFastForward, bool _inPause, bool _syncedFastForward,
                         uint32_t _clockDomain, uint32_t _portDomain, uint64_t _dumpHeartbeats, bool _dumpsResetHeartbeats, uint32_t _restarts,const g_vector<bool>& _mask, const g_vector<uint64_t>& _ffiPoints, const g_string& _syscallBlacklistRegex, const char*_patchRoot)
-            : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), modeSign(1), placeSign(0), started(false), inFastForward(_inFastForward),
+            : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), modeSign(1), placeSign(1), started(false), inFastForward(_inFastForward),
               inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) {}
 
         void addChild(ProcessTreeNode* child) {
@@ -70,10 +70,18 @@ class ProcessTreeNode : public GlobAlloc {
         	modeSign=newMode;//set 
 		}
 
+        uint64_t getmodeSign(){
+            return modeSign;//set 
+        }
+
         void setplaceSign(void){
-            placeSign=^1;
+            placeSign=placeSign^1;
         }
 		
+        uint64_t getplaceSign(){
+            return placeSign;//set 
+        }
+
         ProcessTreeNode* getNextChild() {
             if (curChildren == children.size()) { //allocate a new child
                 uint32_t childProcIdx = __sync_fetch_and_add(&zinfo->numProcs, 1);

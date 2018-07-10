@@ -26,7 +26,7 @@
 #include "src/nvmain_mem_ctrl.h"
 #include "include/NVMainRequest.h"
 #include "core.h"
-
+#include "process_tree.h"  //cswhb
 template <class T>
 class PageTableWalker: public BasePageTableWalker
 {
@@ -117,10 +117,10 @@ class PageTableWalker: public BasePageTableWalker
 			{
 				if( !map_shared_region(req, page, isDRAM) )
 				{
-					//std::cout<<"map "<< pg_walker_name<<":"<<req.lineAddr<<"->"<<page->pageNo<<std::endl;
-					Address overhead = paging->map_page_table( req.lineAddr,(void*)page，isDRAM);
-					pcm_map_overhead += overhead;
-					req.cycle += overhead;
+                    //std::cout<<"map "<< pg_walker_name<<":"<<req.lineAddr<<"->"<<page->pageNo<<std::endl;
+                    Address overhead = paging->map_page_table( req.lineAddr,(void*)page, isDRAM);
+                    pcm_map_overhead += overhead;
+                    req.cycle += overhead;
 				}
 			}
 			else
@@ -137,14 +137,17 @@ class PageTableWalker: public BasePageTableWalker
 		    //Page* page = NULL;
 		    void* page=NULL;
 		    bool evict=false;
-		    bool isDRAM=procArray[procIdx]->modeSign&&procArray[procIdx]->placeSign;
+		    bool isDRAM=zinfo->procArray[procIdx]->getmodeSign()&&zinfo->procArray[procIdx]->getplaceSign();
+		    if(zinfo->procArray[procIdx]->getmodeSign()){
+		    	zinfo->procArray[procIdx]->setplaceSign();
+		    }
 		    if(isDRAM){//page places in DRAM if true,else PCM
+		    	zinfo->DRAMtimes++;
 		    	return do_dram_page_fault(req,0,req.srcId,DRAM_BUFFER_FAULT,NULL,false,evict,isDRAM); //cswhb
-		    	zinfo->DRAMpages++;
 		    }
 		    else if( zinfo->buddy_allocator){
 		    	page = (void*)zinfo->buddy_allocator->allocate_pages(0);
-		    	zinfo->NVMpages++;
+		    	zinfo->NVMtimes++;
 		    }
 			if(page)
 			{
@@ -153,7 +156,7 @@ class PageTableWalker: public BasePageTableWalker
 				tlb_shootdown(req, vpn, tlb_shootdown_overhead );
 				do_share_mem(req, page, isDRAM);
 				allocated_page++;
-				return page->pageNo;
+				return ((Page*)page)->pageNo;
 			}
 			//update page table
 			return (req.lineAddr>>zinfo->page_shift);
@@ -311,6 +314,7 @@ class PageTableWalker: public BasePageTableWalker
 		{
 			Address origin_ppn = dram_block->get_src_addr();
 			Address dram_addr = block_id_to_addr( dram_block->block_id);
+			
 			//evict
 			if( dram_block->is_occupied() && dram_block->is_dirty())
 			{
@@ -322,6 +326,7 @@ class PageTableWalker: public BasePageTableWalker
 			}
 			if( dram_block->is_occupied())
      		{
+     			Address overhead=0;
      			total_evict++;
      			//std::cout<<"evict:"<<dram_addr<<std::endl;
      			if( zinfo->enable_shared_memory)
@@ -344,10 +349,14 @@ class PageTableWalker: public BasePageTableWalker
 				do_share_mem(req, dram_block, isDRAM);
 				//allocated_page++;
 				dram_block->isDRAM = isDRAM;
+				dram_block->validate(vpn);//not used
+     			dram_block->set_src_addr(0);//not used
+     			dram_block->set_vaddr( vpn);
 			}
 			else{
+				Address overhead=0;
 				store_page( req, req.lineAddr, dram_addr, false, NVM::READ);
-     			Address overhead = 0;			
+     			//Address overhead = 0;			
      			//invalidate dram
      			dram_block->validate(req.lineAddr>>(zinfo->block_shift));
      			dram_block->set_src_addr( entry->p_page_no );
@@ -362,20 +371,25 @@ class PageTableWalker: public BasePageTableWalker
      			else
      			{
      				//std::cout<<"remap page table "<<entry->v_page_no<<": "<<entry->p_page_no<<"->"<<(dram_addr>>zinfo->page_shift)<<std::endl;
-     				overhead= paging->map_page_table(( (entry->v_page_no)<<zinfo->page_shift),(void*)dram_block,true);
+     				overhead = paging->map_page_table(( (entry->v_page_no)<<zinfo->page_shift),(void*)dram_block,true);
      			}
-     			if(zinfo->procArray[procIdx]->isDRAM)//free nvm block when process->isDRAM=1  cswhb
+     			if(zinfo->procArray[procIdx]->getmodeSign())//free nvm block when process->modeSign=1  cswhb
      			{
-     				Zone* zone = gfp_zone( 0 );
-     				if(!zone)info("zone error");//debug
+     				unsigned int gfp_mask=0;
+     				Zone* zone =zinfo->buddy_allocator->get_zone( gfp_mask);
+     				if(!zone){
+     				    info("zone error");//debug
+     				}
+     				else{
+     				    info("zone right");
+     				}
      				zinfo->buddy_allocator->free_one_page(zone, entry->p_page_no, 0);//not use cpu hot-cold page   cswhb
      				allocated_page--;
      				dram_block->isDRAM = true;
      			}
+     			req.cycle += overhead;
+			    hscc_map_overhead += overhead;
 			}
-			
-			req.cycle += overhead;
-			hscc_map_overhead += overhead;	
 		}
 		
 		inline void tlb_shootdown( MemReq& req, BaseTlb* tlb, 
@@ -454,7 +468,7 @@ class PageTableWalker: public BasePageTableWalker
 		}
 
 
-		void evict_DRAM_page(MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict, bool isDRAM = flase)
+		void evict_DRAM_page(MemReq& req, DRAMBufferBlock* dram_block,T* entry, uint32_t core_id, bool &evict, bool isDRAM = false)
 		{
 			if( dram_block)
 			{
@@ -474,22 +488,24 @@ class PageTableWalker: public BasePageTableWalker
 					}
 					clflush_overhead += cycle - req.cycle;
 					req.cycle = cycle;
+					if(dram_block->isDRAM){
+					    Page* page = zinfo->buddy_allocator->allocate_pages(0); 
+					    dram_block->set_src_addr( page->pageNo );
+					    dram_block->set_dirty();
+				    }
 					//TLB shootdown1: shootdown evicted pages
 					Address vpn = dram_block->get_vaddr();
 					tlb_shootdown_hscc(req,vpn,dram_block->get_src_addr(), hscc_tlb_shootdown, false);
 				}
 				//if victim DRAM block is dirty, evict to main memory
-				if(dram_block->isDRAM&&dram_block->is_occupied()){
-					Page* page = zinfo->buddy_allocator->allocate_pages(0); 
-					dram_block->set_src_addr( page->pageNo );
-					dram_block->set_dirty();
-				}
 				evict_and_fetch(req, dram_block,entry ,evict, isDRAM);
 				//dram_block->isDRAM = isDRAM;
 				//std::cout<<"migrate from:"<<std::hex<<req.lineAddr<<" to:"<<std::hex<<dram_addr<<std::endl;
 				//TLB shootdown2: related to installed pages
 				Address vpage_installed = entry->v_page_no;
-				tlb_shootdown_hscc(req, vpage_installed,(dram_addr>>zinfo->page_shift), hscc_tlb_shootdown, true); 
+				if(!isDRAM){
+				    tlb_shootdown_hscc(req, vpage_installed,(dram_addr>>zinfo->page_shift), hscc_tlb_shootdown, true); 
+				}
 		 }
 	 }
 

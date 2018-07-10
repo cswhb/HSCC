@@ -88,6 +88,11 @@ bool BuddyAllocator::page_is_buddy(uint64_t page_id , uint64_t buddy_id,
 {
 	bool is_buddy = false;
 	assert( mem_node );
+	if(!(mem_node->get_page_ptr(page_id)->map_count
+			== PAGE_BUDDY_MAPCOUNT_VALUE))
+	{//is buddy page free cswhb
+		return false;
+	}
 	if( get_page_ptr(mem_node , buddy_id)->private_== order )
 	{
 		if( mem_node->get_page_ptr(page_id)->node == 
