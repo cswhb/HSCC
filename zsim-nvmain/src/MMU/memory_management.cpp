@@ -60,6 +60,22 @@ Address BuddyAllocator::get_free_pages(unsigned int gfp_mask , unsigned order)
 	return (allocate_pages(gfp_mask,order)->pageNo)>>(zinfo->page_shift);
 }
 
+/*Address BuddyAllocator::get_pno_page(uint64_t pno)
+{
+	return mem_node->get_page_ptr(pno)
+}
+
+FreeArea * get_free_area(uint64_t procID)
+{
+	if( proc_pagelist_map.count(procID) )
+		return proc_pagelist_map[procID];
+	else
+	{
+		FreeArea* tmp_FreeArea = gm_memalign<FreeArea>(CACHE_LINE_BYTES,1);
+		proc_pagelist_map[procID] = new (tmp_FreeArea) FreeArea();
+		return tmp_FreeArea;
+	}
+}*/
 
 Address BuddyAllocator::get_dma_pages(unsigned gfp_mask , unsigned order)
 {
@@ -88,7 +104,7 @@ bool BuddyAllocator::page_is_buddy(uint64_t page_id , uint64_t buddy_id,
 {
 	bool is_buddy = false;
 	assert( mem_node );
-	if(!(mem_node->get_page_ptr(page_id)->map_count
+	if(!(mem_node->get_page_ptr(buddy_id)->map_count
 			== PAGE_BUDDY_MAPCOUNT_VALUE))
 	{//is buddy page free cswhb
 		return false;

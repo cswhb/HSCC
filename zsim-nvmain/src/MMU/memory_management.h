@@ -27,6 +27,9 @@ class BuddyAllocator
 		Page* allocate_pages( unsigned int gfp_mask , unsigned order = 0 );
 		Address get_free_pages( unsigned int gfp_mask , unsigned order=0);
 		Address get_dma_pages( unsigned int gfp_mask , unsigned order=0);
+        /*****get page ptr from pno*****/
+        //Page* get_pno_page(uint64_t pno);
+        //FreeArea * get_free_area(uint64_t procID);//get FreeArea by procid;  cswhb
 
 		unsigned allocate_bulk( Zone* zone , unsigned int order , uint64_t count , std::list<Page*>& list);
 		/***free pages from specified zone***/
@@ -52,7 +55,8 @@ class BuddyAllocator
 
 		Page* rmqueue_page_smallest(MemoryNode* mem_node , Zone* zone , unsigned order);
 		void expand(MemoryNode* mem_node,Zone* zone , uint64_t page_id , unsigned low_order , unsigned high_order );
-
+        
+       // g_map<uint64_t, FreeArea*> proc_pagelist_map;//proc NVM page list <procID,pagelist>  cswhb
 		void free_hot_cold_page(Page* page , unsigned cpu_id , bool cold);
 	    Zone* gfp_zone( unsigned int flags);
 	private:

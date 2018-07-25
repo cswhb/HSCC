@@ -11,7 +11,10 @@ class Zone;
 class MemoryNode;
 struct Page
 {
-		Page(uint64_t page_no):count(0),pageNo(page_no),
+		/*Page(uint64_t page_no):count(0),pageNo(page_no),isDRAM(0),stat(0),DRAM_Pno(0),proc_id(0),
+								map_count(-1),next(NULL),overlap(0)
+		{}*/
+	    Page(uint64_t page_no):count(0),pageNo(page_no),
 								map_count(-1),next(NULL),overlap(0)
 		{}
 		void inc_reference()
@@ -39,6 +42,10 @@ struct Page
 
 		unsigned count;	//how many processes this page mapped to
 		Address pageNo;	//page no
+		//bool isDRAM;//used in MM_HSCC cswhb
+		//uint64_t stat;
+		//uint64_t DRAM_Pno;//used in MM_HSCC cswhb
+		//uint64_t proc_id;//used in MM_HSCC cswhb
 		int	map_count;
 		Zone* zone;
 		MemoryNode* node;

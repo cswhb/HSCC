@@ -133,7 +133,7 @@ class PageTableWalker: public BasePageTableWalker
 		Address do_page_fault(MemReq& req, PAGE_FAULT fault_type)
 		{
 		    //allocate one page from Zone_Normal area
-		    debug_printf("page falut, allocate free page through buddy allocator");
+		    debug_printf("page falut, allocate free page through buddy allocator or DRAM buffer");
 		    //Page* page = NULL;
 		    void* page=NULL;
 		    bool evict=false;
@@ -141,8 +141,7 @@ class PageTableWalker: public BasePageTableWalker
 		    if(zinfo->procArray[procIdx]->getmodeSign()){
 		    	zinfo->procArray[procIdx]->setplaceSign();
 		    }
-		    if(isDRAM){//page places in DRAM if true,else PCM
-		    	zinfo->DRAMtimes++;
+		    if(isDRAM){//page places in DRAM if true,else PCM	    	
 		    	return do_dram_page_fault(req,0,req.srcId,DRAM_BUFFER_FAULT,NULL,false,evict,isDRAM); //cswhb
 		    }
 		    else if( zinfo->buddy_allocator){
@@ -171,9 +170,16 @@ class PageTableWalker: public BasePageTableWalker
 			if( dram_block)
 			{
 				//*clflush nvm pages from on-chip caches
+				zinfo->DRAMtimes++;
 				bool req_write_back = true;
 				uint64_t write_backs = 0;
-				uint64_t cycle = isDRAM?req.cycle:clflush(req.lineAddr, &req_write_back, req.cycle, coreId, write_backs);
+				uint64_t cycle = 0；
+				if(isDRAM){
+					cycle=req.cycle;
+				}
+				else{
+					cycle=clflush(req.lineAddr, &req_write_back, req.cycle, coreId, write_backs);
+				}
 				if( write_backs)
 					extra_write += write_backs;
 				clflush_overhead += (cycle - req.cycle);
@@ -326,6 +332,7 @@ class PageTableWalker: public BasePageTableWalker
 			}
 			if( dram_block->is_occupied())
      		{
+     			zinfo->DRAMtimes--;
      			Address overhead=0;
      			total_evict++;
      			//std::cout<<"evict:"<<dram_addr<<std::endl;
@@ -361,6 +368,7 @@ class PageTableWalker: public BasePageTableWalker
      			dram_block->validate(req.lineAddr>>(zinfo->block_shift));
      			dram_block->set_src_addr( entry->p_page_no );
      			dram_block->set_vaddr( entry->v_page_no);
+     			dram_block->isDRAM = false;
      			debug_printf("after remap , vpn:%llx , ppn:%llx",entry->v_page_no , entry->p_page_no);
      			//update extended page table
      			if( zinfo->enable_shared_memory )
@@ -377,16 +385,14 @@ class PageTableWalker: public BasePageTableWalker
      			{
      				unsigned int gfp_mask=0;
      				Zone* zone =zinfo->buddy_allocator->get_zone( gfp_mask);
-     				if(!zone){
-     				    info("zone error");//debug
-     				}
-     				else{
-     				    info("zone right");
-     				}
      				zinfo->buddy_allocator->free_one_page(zone, entry->p_page_no, 0);//not use cpu hot-cold page   cswhb
      				allocated_page--;
      				dram_block->isDRAM = true;
+     				zinfo->NVMtimes--;
      			}
+     			/*else{//record proc_id in nvm page  cswhb
+
+     			}*/
      			req.cycle += overhead;
 			    hscc_map_overhead += overhead;
 			}
@@ -493,6 +499,14 @@ class PageTableWalker: public BasePageTableWalker
 					    dram_block->set_src_addr( page->pageNo );
 					    dram_block->set_dirty();
 				    }
+				    /*else{
+				    	Page*page = zinfo->buddy_allocator->get_pno_page(dram_block->get_src_addr())
+				    	if((!(page->isDRAM))||page->DRAM_Pno!=dram_block->block_id){//realloc cswhb
+                            Page* page = zinfo->buddy_allocator->allocate_pages(0); 
+					        dram_block->set_src_addr( page->pageNo );
+					        dram_block->set_dirty();
+				    	}
+				    }*/
 					//TLB shootdown1: shootdown evicted pages
 					Address vpn = dram_block->get_vaddr();
 					tlb_shootdown_hscc(req,vpn,dram_block->get_src_addr(), hscc_tlb_shootdown, false);
