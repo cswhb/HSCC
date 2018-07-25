@@ -16,7 +16,7 @@ class FairAllocator: public BaseDRAMBufferManager
 	public:
 		FairAllocator( unsigned proccess_num , 
 					   Address memory_size);
-		
+		void free_nvm_pages(uint32_t procId);
 		unsigned Release( unsigned process_id , unsigned evict_size );
 		DRAMBufferBlock* allocate_one_page( unsigned process_id );
 		void convert_to_dirty( unsigned process_id , Address block_id);  
@@ -39,6 +39,7 @@ class FairAllocator: public BaseDRAMBufferManager
 		g_vector<int> proc_busy_pages;
 		g_vector<g_unordered_set<Address> > clean_pools;
 		g_vector<g_unordered_set<Address> > dirty_pools;
+		g_vector<g_unordered_set<Address> > free_pools;//record release block; cswhb
 
 		lock_t pool_lock;
 

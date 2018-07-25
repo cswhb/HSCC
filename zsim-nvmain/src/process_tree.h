@@ -82,6 +82,12 @@ class ProcessTreeNode : public GlobAlloc {
             return placeSign;//set 
         }
 
+        void modechange(const uint64_t newMode){
+            if(newMode==1){
+                zinfo->dram_manager->free_nvm_pages(procIdx);
+            }
+            setmodeSign(newMode);
+        }
         ProcessTreeNode* getNextChild() {
             if (curChildren == children.size()) { //allocate a new child
                 uint32_t childProcIdx = __sync_fetch_and_add(&zinfo->numProcs, 1);

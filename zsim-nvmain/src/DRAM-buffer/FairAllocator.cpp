@@ -76,6 +76,7 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 		//if( *clean_pools[proc].)
 		Address block_id = *clean_pools[process_id].begin();
 		clean_pools[process_id].erase( block_id );
+		free_pools[process_id].push_back(block_id);// record free block ,erase when realloc in ptw;cswhb 
 		global_clean_pool.push_back(block_id);
 		busy_pages--;
 	}
@@ -87,6 +88,7 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 		{
 			Address block_id = *dirty_pools[process_id].begin();
 			dirty_pools[process_id].erase(block_id);
+			free_pools[process_id].push_back(block_id);// record free block ,erase when realloc in ptw;cswhb 
 			global_dirty_pool.push_back(block_id);
 			busy_pages--;
 		}
@@ -135,6 +137,11 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( unsigned process_id )
 	}
 	if( alloc_block_id != INVALID_PAGE_ADDR  )
 	{
+		DRAMBufferBlock* dram_block=buffer_array[alloc_block_id];
+		if(!(free_pools[dram_block->proc_id].find(alloc_block_id) == free_pools[dram_block->proc_id].end())){
+            free_pools[dram_block->proc_id].erase(alloc_block_id);
+		}
+		dram_block->proc_id=process_id;//change procid;cswhb
 		clean_pools[process_id].insert( alloc_block_id);
 		busy_pages++;
 		proc_busy_pages[process_id]++;
@@ -193,7 +200,28 @@ void FairAllocator::equal_evict(  )
 		}
 	}
 }
-
+void FairAllocator::free_nvm_pages(uint32_t process_id){
+	unsigned size[3];
+	unsigned size[0] = clean_pools[process_id].size();
+	unsigned size[1] = dirty_pools[process_id].size();
+	unsigned size[2] = free_pools[process_id].size();
+	for(unsigned j=0;j<3;j++)
+	for( unsigned i=0 ; i < size[j]; i++)
+	{
+		//if( *clean_pools[proc].)
+		Address block_id = *clean_pools[process_id][i];
+		DRAMBufferBlock* dram_block=buffer_array[block_id];
+		if(!(dram_block->isDRAM)){
+			Address pno=dram_block->original_addr;//get src nvm pno;cswhb
+			/****free nvm page****/
+			unsigned int gfp_mask=0;
+     		Zone* zone =zinfo->buddy_allocator->get_zone( gfp_mask);
+     		zinfo->buddy_allocator->free_one_page(zone, pno, 0);//not use cpu hot-cold page   cswhb
+     		zinfo->NVMtimes--;
+			dram_block->isDRAM=true;//set dram stat; cswhb
+		}
+	}
+}
 void FairAllocator::fairness_evict()
 {
 }
