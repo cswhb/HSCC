@@ -76,7 +76,7 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 		//if( *clean_pools[proc].)
 		Address block_id = *clean_pools[process_id].begin();
 		clean_pools[process_id].erase( block_id );
-		free_pools[process_id].push_back(block_id);// record free block ,erase when realloc in ptw;cswhb 
+		free_pools[process_id].insert(block_id);// record free block ,erase when realloc in ptw;cswhb 
 		global_clean_pool.push_back(block_id);
 		busy_pages--;
 	}
@@ -88,7 +88,7 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 		{
 			Address block_id = *dirty_pools[process_id].begin();
 			dirty_pools[process_id].erase(block_id);
-			free_pools[process_id].push_back(block_id);// record free block ,erase when realloc in ptw;cswhb 
+			free_pools[process_id].insert(block_id);// record free block ,erase when realloc in ptw;cswhb 
 			global_dirty_pool.push_back(block_id);
 			busy_pages--;
 		}
@@ -201,15 +201,16 @@ void FairAllocator::equal_evict(  )
 	}
 }
 void FairAllocator::free_nvm_pages(uint32_t process_id){
-	unsigned size[3];
-	unsigned size[0] = clean_pools[process_id].size();
-	unsigned size[1] = dirty_pools[process_id].size();
-	unsigned size[2] = free_pools[process_id].size();
+	g_unordered_set<Address> size[3];
+	size[0] = clean_pools[process_id];
+	size[1] = dirty_pools[process_id];
+	size[2] = free_pools[process_id];
 	for(unsigned j=0;j<3;j++)
-	for( unsigned i=0 ; i < size[j]; i++)
+	//for( unsigned i=0 ; i < size[j]; i++)
+	for(g_unordered_set<Address>::iterator p = size[j].begin(); p != size[j].end(); ++p)
 	{
 		//if( *clean_pools[proc].)
-		Address block_id = *clean_pools[process_id][i];
+		Address block_id = *p;
 		DRAMBufferBlock* dram_block=buffer_array[block_id];
 		if(!(dram_block->isDRAM)){
 			Address pno=dram_block->original_addr;//get src nvm pno;cswhb

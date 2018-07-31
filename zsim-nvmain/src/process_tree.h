@@ -31,7 +31,8 @@
 #include "galloc.h"
 #include "log.h"
 #include "zsim.h"
-
+#include "DRAM-buffer/FairAllocator.h"//cswhb
+#include "mode-change/ModChanger.h"//cswhb
 class Config;
 //process tree
 class ProcessTreeNode : public GlobAlloc {
@@ -56,11 +57,15 @@ class ProcessTreeNode : public GlobAlloc {
         const g_vector<bool> mask;
         const g_vector<uint64_t> ffiPoints;
         const g_string syscallBlacklistRegex;
+        ModChanger*modchanger;
     public:
         ProcessTreeNode(uint32_t _procIdx, uint32_t _groupIdx, bool _inFastForward, bool _inPause, bool _syncedFastForward,
                         uint32_t _clockDomain, uint32_t _portDomain, uint64_t _dumpHeartbeats, bool _dumpsResetHeartbeats, uint32_t _restarts,const g_vector<bool>& _mask, const g_vector<uint64_t>& _ffiPoints, const g_string& _syscallBlacklistRegex, const char*_patchRoot)
             : patchRoot(_patchRoot), procIdx(_procIdx), groupIdx(_groupIdx), curChildren(0), heartbeats(0), modeSign(1), placeSign(1), started(false), inFastForward(_inFastForward),
-              inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) {}
+              inPause(_inPause), restartsLeft(_restarts), syncedFastForward(_syncedFastForward), clockDomain(_clockDomain), portDomain(_portDomain), dumpHeartbeats(_dumpHeartbeats), dumpsResetHeartbeats(_dumpsResetHeartbeats), mask(_mask), ffiPoints(_ffiPoints), syscallBlacklistRegex(_syscallBlacklistRegex) {
+                ModChanger* tmp= gm_memalign<ModChanger>(CACHE_LINE_BYTES , 1);
+                modchanger = new (tmp) ModChanger();
+              }
 
         void addChild(ProcessTreeNode* child) {
             children.push_back(child);
@@ -87,6 +92,14 @@ class ProcessTreeNode : public GlobAlloc {
                 zinfo->dram_manager->free_nvm_pages(procIdx);
             }
             setmodeSign(newMode);
+        }
+        void access(uint64_t addr){
+            int newmod;
+            modchanger->access(addr);
+            newmod=modchanger->domodchange(modeSign);
+            if(newmod!=modeSign){
+                modechange(newMode);
+            }
         }
         ProcessTreeNode* getNextChild() {
             if (curChildren == children.size()) { //allocate a new child

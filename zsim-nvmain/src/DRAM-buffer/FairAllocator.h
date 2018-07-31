@@ -10,6 +10,7 @@
 #include "g_std/g_list.h"
 #include "g_std/g_unordered_set.h"
 #include "memory_hierarchy.h"
+#include "MMU/memory_management.h" //cswhb
 #include "DRAM-buffer/DRAM_buffer_block.h"
 class FairAllocator: public BaseDRAMBufferManager 
 {

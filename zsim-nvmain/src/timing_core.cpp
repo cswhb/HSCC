@@ -75,7 +75,7 @@ void TimingCore::contextSwitch(int32_t gid) {
         l1d->contextSwitch();
 		if(itlb)
 			itlb->flush_all();
-		if(dtlb)
+		if(dtlb)x
 			dtlb->flush_all();
     }
 }
@@ -235,6 +235,7 @@ ADDRINT TimingCore::TlbTranslate( ADDRINT virtual_addr , bool is_inst,bool is_wr
 	  MemReq req;
 	  req.lineAddr = virtual_addr;
 	  req.cycle = curCycle;
+	  req.srcId=coreId;//cswhb
 	  if(is_write)
 		req.type = PUTX;
 	  else
