@@ -13,7 +13,7 @@ public:
 		delete []step;
 		delete []times;
 	}
-	void LRU(Address newstep,int mod){
+	void LRU(Address newstep,uint64_t mod){
 	    int minpoint=1<<30,mintimes=1<<30;
 	    for(int i=0;i<MAXBUFFER;i++){
 		    if(mintimes>=times[i]&&(!mod||i!=pointmod)){
@@ -25,7 +25,7 @@ public:
 	    step[minpoint]=newstep;
 	    pointi=minpoint;
     }
-	void access (Address addr,uint32_t proc_id){
+	void access (Address addr){
 		newstep=addrback>addr?addrback-addr:addr-addrback;
         addrback=addr;
         flag=0;
@@ -41,7 +41,7 @@ public:
          }
         }
     }
-    int domodchange(int mod){
+    int domodchange(uint64_t mod){
     	if(flag==0)
            LRU(newstep,mod);
         else{
@@ -70,8 +70,8 @@ public:
 private:
 	Address*step;
     int*times;
-    Address addrback,newstep;
-    int pointi,pointmod,mod,flag;
-}
+    Address addrback,newstep,mod;
+    int pointi,pointmod,flag;
+};
 #endif
 

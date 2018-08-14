@@ -25,6 +25,7 @@ FairAllocator::FairAllocator( unsigned process_num ,
 		g_unordered_set<Address> tmp;
 		clean_pools.push_back(tmp);
 		dirty_pools.push_back(tmp);
+		free_pools.push_back(tmp);
 	}
 	proc_busy_pages.resize(process_count);
 	uint64_t max_pages=((uint64_t)2<<26);
@@ -123,7 +124,7 @@ DRAMBufferBlock* FairAllocator::get_page_ptr( uint64_t entry_id )
 DRAMBufferBlock* FairAllocator::allocate_one_page( unsigned process_id )
 {
 	futex_lock(&pool_lock);
-	assert(!global_clean_pool.empty()|| !global_dirty_pool.empty())
+	assert(!global_clean_pool.empty()|| !global_dirty_pool.empty());
 	Address alloc_block_id = INVALID_PAGE_ADDR;
 	if( !global_clean_pool.empty())
 	{
@@ -131,16 +132,21 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( unsigned process_id )
 		global_clean_pool.pop_front();
 	}
 	else if( !global_dirty_pool.empty())
-	{
+	{1
 		alloc_block_id = global_dirty_pool.front();
 		global_dirty_pool.pop_front();
 	}
 	if( alloc_block_id != INVALID_PAGE_ADDR  )
 	{
 		DRAMBufferBlock* dram_block=buffer_array[alloc_block_id];
-		if(!(free_pools[dram_block->proc_id].find(alloc_block_id) == free_pools[dram_block->proc_id].end())){
-            free_pools[dram_block->proc_id].erase(alloc_block_id);
+		for(g_unordered_set<Address>::iterator it =free_pools[dram_block->proc_id].begin();it != free_pools[dram_block->proc_id].end();++it )
+		{
+			if((*it)==alloc_block_id)
+				free_pools[dram_block->proc_id].erase(alloc_block_id);
 		}
+		/*if(!(free_pools[dram_block->proc_id].find(alloc_block_id) == free_pools[dram_block->proc_id].end())){
+            free_pools[dram_block->proc_id].erase(alloc_block_id);
+		}*/
 		dram_block->proc_id=process_id;//change procid;cswhb
 		clean_pools[process_id].insert( alloc_block_id);
 		busy_pages++;

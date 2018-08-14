@@ -12,6 +12,7 @@
 #include "tlb/common_func.h"
 #include "DRAM-buffer/DRAM_buffer_block.h"
 #include "process_tree.h" //cswhb
+#include "core.h"//cswhb
 //#include "tlb/page_table_walker.h"
 
 template<class T>
@@ -35,7 +36,7 @@ class HotMonitorTlb: public BaseTlb
 		/*******TLB access related functions************/		
 		uint64_t access(MemReq& req)
 		{
-			uint32_t procid=(zinfo->cores[req.srcId])->GetProcIdx();//cswhb
+			//uint32_t procid=(zinfo->cores[req.srcId])->GetProcIdx();//cswhb
 			ordinary_tlb->tlb_access_time++;
 			Address virt_addr = req.lineAddr;
 			zinfo->procArray[procIdx]->access(virt_addr);//cswhb

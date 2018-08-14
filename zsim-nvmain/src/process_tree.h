@@ -94,11 +94,11 @@ class ProcessTreeNode : public GlobAlloc {
             setmodeSign(newMode);
         }
         void access(uint64_t addr){
-            int newmod;
+            uint64_t newmod;
             modchanger->access(addr);
             newmod=modchanger->domodchange(modeSign);
             if(newmod!=modeSign){
-                modechange(newMode);
+                modechange(newmod);
             }
         }
         ProcessTreeNode* getNextChild() {

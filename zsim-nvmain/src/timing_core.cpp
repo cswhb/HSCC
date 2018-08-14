@@ -75,7 +75,7 @@ void TimingCore::contextSwitch(int32_t gid) {
         l1d->contextSwitch();
 		if(itlb)
 			itlb->flush_all();
-		if(dtlb)x
+		if(dtlb)
 			dtlb->flush_all();
     }
 }
