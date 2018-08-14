@@ -132,7 +132,7 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( unsigned process_id )
 		global_clean_pool.pop_front();
 	}
 	else if( !global_dirty_pool.empty())
-	{1
+	{
 		alloc_block_id = global_dirty_pool.front();
 		global_dirty_pool.pop_front();
 	}
