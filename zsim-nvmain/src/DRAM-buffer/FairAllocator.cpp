@@ -5,7 +5,7 @@
  */
 #include "DRAM-buffer/FairAllocator.h"
 #include "zsim.h"
-FairAllocator::FairAllocator( unsigned process_num , 
+FairAllocator::FairAllocator( unsigned process_num ,
 				Address memory_size): process_count(process_num),
 									  memory_capacity( memory_size ), busy_pages(0)
 {
@@ -13,8 +13,8 @@ FairAllocator::FairAllocator( unsigned process_num ,
 	//create descriptors for all pages
 	for( Address i = 0; i < total_page_count; i++ )
 	{
-		 DRAMBufferBlock* block = new DRAMBufferBlock(i); 
-		 buffer_array.push_back( block );	
+		 DRAMBufferBlock* block = new DRAMBufferBlock(i);
+		 buffer_array.push_back( block );
 		 global_clean_pool.push_back(i);
 	}
 	global_dirty_pool.clear();
@@ -25,7 +25,7 @@ FairAllocator::FairAllocator( unsigned process_num ,
 		g_unordered_set<Address> tmp;
 		clean_pools.push_back(tmp);
 		dirty_pools.push_back(tmp);
-		free_pools.push_back(tmp);
+        free_pools.push_back(tmp);
 	}
 	proc_busy_pages.resize(process_count);
 	uint64_t max_pages=((uint64_t)2<<26);
@@ -77,7 +77,7 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 		//if( *clean_pools[proc].)
 		Address block_id = *clean_pools[process_id].begin();
 		clean_pools[process_id].erase( block_id );
-		free_pools[process_id].insert(block_id);// record free block ,erase when realloc in ptw;cswhb 
+		//free_pools[process_id].insert(block_id);// record free block ,erase when realloc in ptw;cswhb
 		global_clean_pool.push_back(block_id);
 		busy_pages--;
 	}
@@ -89,7 +89,8 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 		{
 			Address block_id = *dirty_pools[process_id].begin();
 			dirty_pools[process_id].erase(block_id);
-			free_pools[process_id].insert(block_id);// record free block ,erase when realloc in ptw;cswhb 
+			//free_pools[process_id].insert(block_id);// record free block ,erase when realloc in ptw;cswhb
+            //buffer_array[block_id]->isFREE=true;
 			global_dirty_pool.push_back(block_id);
 			busy_pages--;
 		}
@@ -97,10 +98,10 @@ unsigned FairAllocator::Release( unsigned process_id, unsigned evict_size )
 	proc_busy_pages[process_id] -= evict_size;
 	assert(should_reclaim()==false);
 	futex_unlock(&pool_lock);
-	return evict_size;	
+	return evict_size;
 }
 
-double FairAllocator::get_memory_usage() 
+double FairAllocator::get_memory_usage()
 {
 	return (double)busy_pages/(double)total_page_count;
 }
@@ -139,13 +140,15 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( unsigned process_id )
 	if( alloc_block_id != INVALID_PAGE_ADDR  )
 	{
 		DRAMBufferBlock* dram_block=buffer_array[alloc_block_id];
-		for(g_unordered_set<Address>::iterator it =free_pools[dram_block->proc_id].begin();it != free_pools[dram_block->proc_id].end();++it )
+        if(dram_block->isFREE){
+            free_pools[dram_block->proc_id].erase(alloc_block_id);
+            dram_block->isFREE=false;
+        }
+		/*for(g_unordered_set<Address>::iterator it =free_pools[dram_block->proc_id].begin();it != free_pools[dram_block->proc_id].end();++it )
 		{
+            if(*it)info("it = NULL");
 			if((*it)==alloc_block_id)
 				free_pools[dram_block->proc_id].erase(alloc_block_id);
-		}
-		/*if(!(free_pools[dram_block->proc_id].find(alloc_block_id) == free_pools[dram_block->proc_id].end())){
-            free_pools[dram_block->proc_id].erase(alloc_block_id);
 		}*/
 		dram_block->proc_id=process_id;//change procid;cswhb
 		clean_pools[process_id].insert( alloc_block_id);
@@ -154,7 +157,7 @@ DRAMBufferBlock* FairAllocator::allocate_one_page( unsigned process_id )
 		futex_unlock(&pool_lock);
 		return buffer_array[alloc_block_id];
 	}
-	futex_unlock(&pool_lock);	
+	futex_unlock(&pool_lock);
 	return NULL;
 }
 
@@ -192,7 +195,7 @@ void FairAllocator::equal_evict(  )
 {
 	int reclaim_pages = min_free_pages-(total_page_count-busy_pages);
 	//reclaim equally
-	double rate;		
+	double rate;
 	Address proc_busy_size;
 	Address release_size;
 	for( uint32_t i=0; i< process_count; i++)
@@ -207,27 +210,29 @@ void FairAllocator::equal_evict(  )
 	}
 }
 void FairAllocator::free_nvm_pages(uint32_t process_id){
-	g_unordered_set<Address> size[3];
-	size[0] = clean_pools[process_id];
-	size[1] = dirty_pools[process_id];
-	size[2] = free_pools[process_id];
-	for(unsigned j=0;j<3;j++)
+	//for(unsigned j=0;j<3;j++)
 	//for( unsigned i=0 ; i < size[j]; i++)
-	for(g_unordered_set<Address>::iterator p = size[j].begin(); p != size[j].end(); ++p)
+	for(g_unordered_set<Address>::iterator p = free_pools[process_id].begin(); p != free_pools[process_id].end(); ++p)
 	{
 		//if( *clean_pools[proc].)
 		Address block_id = *p;
 		DRAMBufferBlock* dram_block=buffer_array[block_id];
-		if(!(dram_block->isDRAM)){
+		if(!(dram_block->isDRAM)&&(dram_block->proc_id==process_id)){
 			Address pno=dram_block->original_addr;//get src nvm pno;cswhb
 			/****free nvm page****/
 			unsigned int gfp_mask=0;
      		Zone* zone =zinfo->buddy_allocator->get_zone( gfp_mask);
      		zinfo->buddy_allocator->free_one_page(zone, pno, 0);//not use cpu hot-cold page   cswhb
+            zinfo->nvm_free_times++;
      		zinfo->NVMtimes--;
 			dram_block->isDRAM=true;//set dram stat; cswhb
+            //info("free nvm page mod change");
 		}
+		free_pools[process_id].erase(block_id);
 	}
+}
+void FairAllocator::insert_free_pools(uint32_t proc_id,Address block_id){
+	free_pools[proc_id].insert(block_id);
 }
 void FairAllocator::fairness_evict()
 {

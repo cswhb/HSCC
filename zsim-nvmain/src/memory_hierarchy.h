@@ -203,6 +203,7 @@ class BaseDRAMBufferManager: public GlobAlloc
 		virtual bool should_reclaim(){ return false; }
 		virtual bool should_cherish(){ return false;}
 		virtual bool should_more_cherish(){ return false;}
+		virtual void insert_free_pools(uint32_t proc_id,Address block_id){}
 		virtual DRAMBufferBlock* get_page_ptr( uint64_t entry_id )=0;
 };
 
