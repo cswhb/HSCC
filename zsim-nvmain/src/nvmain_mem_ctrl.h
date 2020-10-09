@@ -58,6 +58,7 @@
 #include "NVM/Flat_NVMain/FlatNVMain.h"
 #include "g_std/g_vector.h"
 #include "g_std/g_unordered_set.h"
+#include "climber/climberif.h"
 #define MIN(x, y) ({ __typeof__(x) xx = (x); __typeof__(y) yy = (y); (xx < yy)? xx : yy;})
 #define MAX(x, y) ({ __typeof__(x) xx = (x); __typeof__(y) yy = (y); (xx > yy)? xx : yy;})
 
@@ -140,6 +141,7 @@ class NVMainMemory : public MemObject, public NVM::NVMObject { //one NVMain cont
 		uint64_t request_complete;
 		uint64_t recorder_num;
 		uint64_t issued_num;
+		climberif* climberp;
     public:
         //NVMainMemory(std::string& nvmainTechIni, std::string& outputFile, std::string& traceName, uint32_t capacityMB, uint64_t _minLatency, uint32_t _domain, const g_string& _name);
         NVMainMemory(std::string& nvmainTechIni, std::string& outputFile, std::string& traceName, uint32_t capacityMB, uint64_t _minLatency, uint32_t _domain, const g_string& _name , std::string fetcher_name="BlockFetcher");	

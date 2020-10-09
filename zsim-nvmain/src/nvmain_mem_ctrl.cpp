@@ -172,6 +172,10 @@ NVMainMemory::NVMainMemory(std::string& nvmainTechIni, std::string& outputFile, 
     nvmainEventQueue = new NVM::EventQueue();
     nvmainGlobalEventQueue = new NVM::GlobalEventQueue();
     nvmainTagGenerator = new NVM::TagGenerator(1000);
+    ifstream climbercfg("climber.cfg"); 
+    string climbertype;
+    getline(myfile,climbertype)
+    climberp = new climberif(capacityMB<<8,climbertype.c_str());
 
     nvmainConfig->SetSimInterface(nvmainSimInterface);
 
@@ -417,7 +421,48 @@ inline NVMainAccEvent* NVMainMemory::push_to_main_memory( MemReq& req, uint64_t 
 	zinfo->eventRecorders[req.srcId]->pushRecord(tr);
 	return memEv;
 }
-
+uint64_t NVMainMemory::access(MemReq& req, int discard) {
+    ///whb:do climber 
+	//futex_lock(&access_lock);
+    switch (req.type) {
+        case PUTS:
+            profPUTS.inc();
+            *req.state = I;
+            break;
+        case PUTX:
+            profPUTX.inc();
+            *req.state = I;
+            break;
+        case GETS:
+            *req.state = req.is(MemReq::NOEXCL)? S : E;
+            break;
+        case GETX:
+            *req.state = M;
+            break;
+        default: panic("!?");
+    }
+	uint64_t respCycle = req.cycle + minLatency;
+    assert(respCycle > req.cycle);
+    if ((zinfo->hasDRAMCache || (req.type != PUTS)))
+	{
+        bool isWrite = ((req.type == PUTX) || (req.type == PUTS));
+		nvmain_access_count++;
+		if(isWrite)
+			nvmain_write_access_count++;
+		else
+			nvmain_read_access_count++;
+		NVMainAccEvent* memEv= push_to_main_memory( req, respCycle );
+		//futex_unlock(&access_lock);
+		if( zinfo->counter_tlb)
+		{
+			profiling( memEv ,req.srcId );
+			adjust_threshold();	
+		}
+	}
+	//else
+		//futex_unlock(&access_lock);
+    return respCycle;
+}
 uint64_t NVMainMemory::access(MemReq& req) {
 	futex_lock(&access_lock);
     switch (req.type) {
